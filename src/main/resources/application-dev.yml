@@ -1,0 +1,259 @@
+management:
+    security:
+        enabled: false
+security:
+    basic:
+        enabled: false
+
+#kafka:
+#    topic:
+#        updateEtatLit: updateEtatLit
+#        ajoutEtatLit : ajoutEtatLit
+#        deleteEtatLit : deleteEtatLit
+#    servers:
+##        bootstrap: 192.168.10.60:9092
+#        bootstrap: 172.16.10.13:9092    
+spring: 
+    devtools:
+        restart:
+            enabled: true
+        livereload:
+            enabled: true
+    redis: 
+        host: redis
+    datasource:
+#        url: jdbc:sqlserver://197.14.53.85:1410;database=GcliniqueDev
+ 
+#        url: jdbc:sqlserver://172.20.18.151\sql2014;database=GcliniqueEgyptePreProd
+#        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueEgypteCSH
+#        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueDev
+#        url: jdbc:sqlserver://172.22.102.50\sql2014;database=GcliniqueEgypte
+        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueParam
+#        url: jdbc:sqlserver://172.20.102.20\sql2014;database=GcliniqueEgypte
+#        url: jdbc:sqlserver://172.21.102.20\sql2014;database=GcliniqueEgypte
+#        url: jdbc:sqlserver://172.23.102.20\sql2014;database=GcliniqueEgypte
+        username: sa
+        password: m0dp@$$
+#        password: 123
+
+#        url: jdbc:sqlserver://172.16.10.10\SQL2014;database=GcliniqueDev
+#        url: jdbc:sqlserver://172.16.10.10\SQL2014;database=GcliniqueParam
+#        username: sa
+#        password: m0dp@$$ASH
+#        url: jdbc:sqlserver://172.20.18.151:1415;database=GcliniqueEgyptePreProd
+#        username: SA
+#        password: m0dp@$$
+
+#        url: jdbc:sqlserver://172.31.1.20\sql2014;database=Pharmacie
+#        username: sa
+#        password: m0dpa$$
+
+#        url: jdbc:sqlserver://DESKTOP-CAFJH8N\sql2014;database=GcliniqueEgyptePreProd
+#        username: SA
+#        password: 123
+#
+#        url: jdbc:h2:file:./h2db/db/parametrage;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS param_achat
+#        username: sa
+#        password:
+    jpa:
+        database-platform: org.hibernate.dialect.SQLServer2012Dialect
+        database: SQL_SERVER
+        open-in-view: false
+        show-sql: true
+        hibernate:
+            ddl-auto: none
+#            ddl-auto: create
+            naming:
+                implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        properties:
+            hibernate.default_schema: param_achat
+            hibernate.id.new_generator_mappings: true
+            hibernate.cache.use_second_level_cache: false
+            hibernate.cache.use_query_cache: false
+            hibernate.generate_statistics: false
+#            hibernate.cache.region.factory_class: com.hazelcast.hibernate.HazelcastCacheRegionFactory
+#            hibernate.cache.hazelcast.instance_name: hazelcast
+            hibernate.cache.use_minimal_puts: true
+            org.hibernate.envers.store_data_at_delete: true
+#            hibernate.cache.hazelcast.use_lite_member: true 
+    profiles:
+        include: no-liquibase,kafka,testCentral
+    jackson:
+        serialization:
+            write_dates_as_timestamps : false
+    
+    boot:
+        admin:
+            url: http://172.16.10.15:1111
+                   
+logging:
+    level:
+       org:
+         hibernate:
+               type: DEBUG                
+paramAchatService :
+    base-uri : http://172.16.10.15/parametrage-achat-core
+#    base-uri : http://172.16.10.15/parametrage-achat-core
+#    base-uri : http://localhost:9001/parametrage-achat-core
+#    base-uri : http://172.20.102.26/parametrage-achat-core
+#    base-uri : http://172.23.102.26/parametrage-achat-core
+   # base-uri : http://localhost:9001/parametrage-achat-core
+    path: /parametrage-achat-core
+    departement : /api/departements
+    depot : /api/depots
+    articles: /api/articles
+    medication : /api/medications
+    medical : /api/medical-items
+    non-medical : /api/assets
+    immo : /api/immo
+    fournisseurs : /api/fournisseurs
+    catArticle: /api/categorie-articles
+    tvas: /api/tvas
+    unite: /api/unites
+    categorie-article: /api/categorie-articles
+    categorie-depots: /api/categorie-depots
+    emplacement: /api/emplacements
+    article-depot: /api/article-depot
+    motif-paiement: /api/motif-paiements 
+    article-non-mouvemente: /api/article-non-mvts
+    motif-demande-redressement: /api/motif-demande-redressement
+    palier-marge-categorie-article: /api/palier-marge-categorie-articles
+    injection: /api/injection
+    classification-articles: /api/classification-articles
+    palier-classification-articles: /api/palier-classification-articles
+
+immobilisation :
+#   base-uri : http://172.16.10.15/immobilisation-core
+   base-uri : http://172.16.10.15/immobilisation-core
+   immobilisations : /api/immobilisations
+   
+receptionService :
+    base-uri : http://172.16.10.15/reception-core
+#    base-uri : http://172.16.10.15/reception-core
+#    base-uri : http://197.14.53.85:8090/reception-core
+    admission-facturations: /api/admission-facturations
+    findAdmissionByCodeInForDemandePEC: /api/admissions/findAdmissionByCodeInForDemandePEC
+    findSocieteByCodeAdmission: /api/admissions/societe/
+    facturationQuittanceAvoir: /api/detailsadmissions/quittance-pharmacie
+    deleteFacturationByNumQuittance: /api/detailsadmissions/delete-by-num-quittance
+    admissions: /api/admissions/
+#    detailsadmissions: /api/detailsadmissions
+demandeService :
+    base-uri : http://172.16.10.15/demande-core
+#    base-uri : http://172.16.10.15/demande-core
+#    base-uri : http://172.20.102.26/demande-core
+    commandeachats : /api/commandeachats/searches
+    commandeachatsbycode : /api/commandeachats
+    demandetrs : /api/demandetrs
+    demandeprs : /api/demandeprs
+    commandeachatmodereglements: /api/commande-achat-mode-reglements
+    demanderedressement: /api/demande-redressement
+    
+paramService :
+  base-uri : http://172.16.10.15/parametrage-core
+#  base-uri : http://172.16.10.15/parametrage-core
+#  base-uri : http://172.20.102.26/parametrage-core
+#  base-uri : http://172.22.102.26/parametrage-core
+  cliniques : /api/cliniques
+  lits : /api/lits
+  societes : /api/societes
+  remise-price-list-categorie-article : /api/priceliste-par-categorie-article
+  details-panier-prestation : /api/prestations/DetailsPanierBycodePrestation
+  chambres : /api/chambres
+  medecins : /api/medecins
+  costCenter: /api/cost-profit-centres
+  modeReglement : /api/mode-reglements
+  operations : /api/operations
+  site: /api/sites
+  
+caisseService :
+  base-uri : http://172.16.10.15/caisse-core
+  devises : /api/devises
+ 
+cliniSys :
+    base-uri : http://172.16.10.15/CliniSys
+#    base-uri : http://localhost:9090/CliniSys
+#    base-uri : http://197.14.53.85:8090/CliniSys
+#    base-uri : http://172.22.102.26/CliniSys
+    sendEmails : /api/emails
+    searchEmails: /api/users
+    findUserRole: /api/user-roles
+    findRole: /api/roles
+    senderAdress: clinisys.csh@cleohc.com
+    
+#AccessService :
+#    base-uri : http://192.168.0.131/CliniSys
+               
+lang:
+    secondary: ar
+
+default-value-interval-retour-prelevement: 7
+retour-perime.config.expiration-date-interval: 30
+motif-id-transfert-validation: 6
+validation-transfert-auto: true
+default-list-users-to-notify-for-validation-transfert: salma.clinisys,a,farouk.clinisys
+difference-permise-bon-retour: 500000
+max-marge-montant-facture: 0.05
+default-code-motif-paiement-ca: 3
+blockage-sale-price-purchase: true
+blocking-delay-between-quittances: 5
+transfert-perime.config.expiration-date-interval: 90
+max-delay-return-item-thermosensitive: 15
+default-number-of-transferts: 3
+default-number-of-prelevements: 3
+prix-choisi-calcul-prix-vente-uu: prix-reference
+reception-en-deux-etapes : false 
+automatic-receiving : false 
+apply-marginal-for-medication-items: false
+transfert-only-with-request: false
+clinic-name: Hikma
+time-of-cron-valeur-stock: '50 59 23 * * *'
+blocking-delay-between-transfert-recup: 5
+time-of-cron-prepare-data-rop-ph: '00 00 01 * * *'
+time-of-cron-excuted-rop-ph: '00 30 01 * * *'
+time-of-cron-prepare-data-rop-uu: '00 00 02 * * *'
+time-of-cron-excuted-rop-uu: '00 30 02 * * *'
+time-of-cron-prepare-data-rop-ec: '00 00 03 * * *'
+time-of-cron-excuted-rop-ec: '00 30 03 * * *'
+time-of-cron-prepare-data-rop-immo: '00 00 04 * * *'
+time-of-cron-excuted-rop-immo: '00 30 04 * * *'
+
+server:
+    port: 9004
+    contextPath: /pharmacie-core
+    
+proxy:
+    ip: http://integration.clinisys.local
+
+hystrix:
+    command.default.execution.isolation.strategy: THREAD   
+    
+liquibase:
+    default-schema: param_achat
+    enabled: false 
+    change-log: classpath:db/changelog-master.xml 
+kafka:
+    topic:
+      transfert-bon-reception-onShelf-management: transfert-bon-reception-onShelf-management
+      transfer-company-to-branch-management: transfer-company-to-branch-management
+      transfer-branch-to-company-management: transfer-branch-to-company-management
+      direct-bill-management-for-accounting: direct-bill-management-for-accounting
+    servers:
+        bootstrap: 172.16.10.30:9092,172.16.10.31:9092,172.16.10.32:9092 
+    group_id: pharmacie-core_local   
+http:
+    auth-token-header-name: x-api-key
+    auth-token: c040d610-134a-475d-b0a3-707e300927a5
+context:
+    reception: 
+    transfert-with-quittance: 
+    
+mailFrom: soft@csys.com.tn    
+environnement: local   
+code-site: 9
+code-company-for-branch: 1
+ipAdressSite-csh-ParamAchat: 172.16.10.15:30012
+#ipAdressSite-csh-Param: 172.16.10.15:30011
+ipAdressSite-cleo-ParamAchat: 172.16.10.15:30112  
+#ipAdressSite-cleo-Param:  

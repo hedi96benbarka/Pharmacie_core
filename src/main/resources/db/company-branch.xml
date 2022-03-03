@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+ 
+    <changeSet id="1" author="siryne"  >       
+ 
+  
+        <sql>
+            alter table param_achat.mvtstoba add  code_article_fournisseur nvarchar(30)
+            alter table param_achat.mvtstoba_aud add  code_article_fournisseur nvarchar(30)
+        </sql>
+     
+    </changeSet>
+    <changeSet id="2" author="siryne"  >       
+ 
+  
+        <sql>
+            CREATE TABLE [param_achat].[transfert_company_branch](
+            [num_bon] [nvarchar](20) NOT NULL,
+            [type_bon] [nvarchar](3) NOT NULL,
+            [categ_depot] [nvarchar](50) NULL,
+            [num_affiche] [nvarchar](14) NOT NULL,
+            [user_create] [nvarchar](20) NOT NULL,
+            [date_create] [datetime] NOT NULL,
+            [code_fournisseur] [nvarchar](10) NOT NULL,
+            [montant_ttc] [numeric](18, 3) NULL,
+            [numbon_reception] [nvarchar](20) NULL,
+            [code_depot] [int] NOT NULL,
+            [immobilisation_genere] [bit] NULL,
+            [replicated] [bit] NULL,
+            [integrer] [bit] NULL,
+            [Num_Vir] [nvarchar](10) NULL,
+            [Cod_ecr] [nvarchar](10) NULL,
+            [numbon_transfert_relatif] [nvarchar](20) NULL,
+            [date_create_reception] [datetime] NULL,
+            [code_site_destination] [int] NULL,
+            [code_site] [int] NULL,
+            CONSTRAINT [PK_transfert_company_branch] PRIMARY KEY CLUSTERED 
+            (
+            [num_bon] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+        </sql>
+        <sql>
+            CREATE TABLE [param_achat].[transfert_company_branch_AUD](
+            [REV] [int] NOT NULL,
+            [REVTYPE] [smallint] NULL,
+            [num_bon] [nvarchar](20) NOT NULL,
+            [type_bon] [nvarchar](3) NOT NULL,
+            [categ_depot] [nvarchar](50) NULL,
+            [num_affiche] [nvarchar](14) NOT NULL,
+            [user_create] [nvarchar](20) NOT NULL,
+            [date_create] [datetime] NOT NULL,
+            [code_fournisseur] [nvarchar](10) NOT NULL,
+            [montant_ttc] [numeric](18, 3) NULL,
+            [numbon_reception] [nvarchar](20) NULL,
+            [code_depot] [int] NOT NULL,
+            [immobilisation_genere] [bit] NULL,
+            [replicated] [bit] NULL,
+            [integrer] [bit] NULL,
+            [Num_Vir] [nvarchar](10) NULL,
+            [Cod_ecr] [nvarchar](10) NULL,
+            [numbon_transfert_relatif] [nvarchar](20) NULL,
+            [date_create_reception] [datetime] NULL,
+            [code_site] [int] NULL,
+            CONSTRAINT [PK_transfert_company_branch_AUD] PRIMARY KEY CLUSTERED 
+            (
+            [REV] ASC,
+            [num_bon] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+        </sql>
+        <sql>
+
+            CREATE TABLE [param_achat].[detail_transfert_company_branch](
+            [code] [bigint] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [code_article] [bigint] NOT NULL,
+            [num_bon] [nvarchar](20) NOT NULL,
+            [lot_inter] [nvarchar](17) NULL,
+            [date_peremption] [datetime] NULL,
+            [categ_depot] [nvarchar](10) NULL,
+            [code_saisi] [nvarchar](50) NOT NULL,
+            [code_unite] [int] NOT NULL,
+            [designation_sec] [nvarchar](255) NOT NULL,
+            [designation] [nvarchar](255) NULL,
+            [quantite] [numeric](18, 3) NULL,
+            [prix_unitaire] [numeric](18, 8) NOT NULL,
+            [montant_ht] [numeric](18, 3) NULL,
+            [code_tva] [int] NULL,
+            [taux_tva] [numeric](18, 3) NULL,
+            [base_tva] [decimal](18, 7) NULL,
+            [remise] [decimal](18, 7) NULL,
+            [pmp_precedant] [decimal](18, 3) NULL,
+            [quantite_precedante] [decimal](18, 3) NULL,
+            [is_capitalize] [bit] NULL,
+            [prix_vente] [decimal](18, 3) NULL,
+            [quantite_restante] [decimal](18, 3) NULL,
+            [ancien_prix_achat] [numeric](18, 7) NULL,
+            [is_reference_price] [bit] NULL,
+            CONSTRAINT [PK_detail_transfert_company_branch] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[detail_transfert_company_branch]  WITH CHECK ADD  CONSTRAINT [FK_detail_transfert_company_branch] FOREIGN KEY([num_bon])
+            REFERENCES [param_achat].[transfert_company_branch] ([num_bon])
+
+
+            ALTER TABLE [param_achat].[detail_transfert_company_branch] CHECK CONSTRAINT [FK_detail_transfert_company_branch]
+        </sql>
+        <sql>
+
+            CREATE TABLE [param_achat].[detail_transfert_company_branch_AUD](
+            [code] [bigint] NOT NULL,
+            [REV] [int] NOT NULL,
+            [REVTYPE] [smallint] NULL,
+            [code_article] [bigint] NOT NULL,
+            [num_bon] [nvarchar](20) NOT NULL,
+            [lot_inter] [nvarchar](17) NULL,
+            [date_peremption] [datetime] NULL,
+            [categ_depot] [nvarchar](10) NULL,
+            [code_saisi] [nvarchar](50) NOT NULL,
+            [code_unite] [int] NOT NULL,
+            [designation_sec] [nvarchar](255) NOT NULL,
+            [designation] [nvarchar](255) NULL,
+            [quantite] [numeric](18, 3) NULL,
+            [prix_unitaire] [numeric](18, 8) NOT NULL,
+            [montant_ht] [numeric](18, 3) NULL,
+            [code_tva] [int] NULL,
+            [taux_tva] [numeric](18, 3) NULL,
+            [base_tva] [decimal](18, 7) NULL,
+            [remise] [decimal](18, 7) NULL,
+            [pmp_precedant] [decimal](18, 3) NULL,
+            [quantite_precedante] [decimal](18, 3) NULL,
+            [is_capitalize] [bit] NULL,
+            [prix_vente] [decimal](18, 3) NULL,
+            [quantite_restante] [decimal](18, 3) NULL,
+            [is_reference_price] [bit] NULL,
+            [ancien_prix_achat] [numeric](18, 7) NULL,
+            CONSTRAINT [PK_detail_transfert_company_branch_AUD] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC,
+            [REV] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+        </sql>
+        <sql>
+
+            CREATE TABLE [param_achat].[trace_detail_transfert_company_branch](
+            [code] [bigint] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [code_detail_transfert] [bigint] NULL,
+            [code_depsto] [bigint] NOT NULL,
+            [code_article] [bigint] NOT NULL,
+            [numbon_transfert] [nvarchar](50) NOT NULL,
+            [quantite_disponible] [decimal](18, 3) NOT NULL,
+            [quantite_prelevee] [decimal](18, 3) NOT NULL,
+            [numbon_depsto] [nvarchar](50) NULL,
+            [lot_inter_depsto] [nvarchar](50) NULL,
+            [date_peremption_depsto] [datetime] NULL,
+            [prix_unitaire_depsto] [numeric](18, 3) NULL,
+            [unite] [int] NULL,
+            [code_tva_depsto] [int] NULL,
+            [taux_tva_depsto] [numeric](18, 3) NULL,
+            [numbon_origin_depsto] [nvarchar](20) NULL,
+            [is_capitalize] [bit] NULL,
+            CONSTRAINT [PK_trace_detail_transfert_company_branch] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+            ALTER TABLE [param_achat].[trace_detail_transfert_company_branch]  WITH CHECK ADD  CONSTRAINT [FKcode_detail_transfert] FOREIGN KEY([code_detail_transfert])
+            REFERENCES [param_achat].[detail_transfert_company_branch] ([code])
+
+            ALTER TABLE [param_achat].[trace_detail_transfert_company_branch] CHECK CONSTRAINT [FKcode_detail_transfert]
+
+
+        </sql>
+        <sql>
+
+            CREATE TABLE [param_achat].[trace_detail_transfert_company_branch_AUD](
+            [code] [bigint] NOT NULL,
+            [REV] [int] NOT NULL,
+            [REVTYPE] [smallint] NULL,
+            [code_detail_transfert] [bigint] NULL,
+            [code_depsto] [bigint] NOT NULL,
+            [code_article] [bigint] NOT NULL,
+            [numbon_transfert] [nvarchar](50) NOT NULL,
+            [quantite_disponible] [decimal](18, 3) NOT NULL,
+            [quantite_prelevee] [decimal](18, 3) NOT NULL,
+            [numbon_depsto] [nvarchar](50) NULL,
+            [lot_inter_depsto] [nvarchar](50) NULL,
+            [date_peremption_depsto] [datetime] NULL,
+            [prix_unitaire_depsto] [numeric](18, 3) NULL,
+            [unite] [int] NULL,
+            [code_tva_depsto] [int] NULL,
+            [taux_tva_depsto] [numeric](18, 3) NULL,
+            [numbon_origin_depsto] [nvarchar](20) NULL,
+            [is_capitalize] [bit] NULL,
+            CONSTRAINT [PK_trace_detail_transfert_company_branch_AUD] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC,
+            [REV] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+        </sql>
+    </changeSet>
+  
+    <changeSet id="4" author="siryne"  >       
+        <sql>
+            alter table param_achat.receiving add code_site int
+        </sql>
+    </changeSet>
+    
+    <changeSet id="5" author="siryne" >       
+        <sql>
+            alter table[param_achat].[detail_transfert_company_branch]	add [code_emplacement] [int] NULL
+            alter table param_achat.detail_transfert_company_branch_aud	add [code_emplacement] [int] NULL
+        </sql>
+    </changeSet>
+    <changeSet id="6" author="siryne"  >       
+  
+        <sql>
+            DELETE from param_achat.[Compteur_Pharmacie] where type_bon='TCB'
+           
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('PH'
+            ,'PHTBC22'
+            ,'000001'
+            ,9
+            ,'TBC')
+    
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('UU'
+            ,'UUTBC22'
+            ,'000001'
+            ,9
+            ,'TBC')
+ 
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('EC'
+            ,'ECTBC22'
+            ,'000001'
+            ,9
+            ,'TBC')
+
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('IMMO'
+            ,'FATBC22'
+            ,'000001'
+            ,9
+            ,'TBC')
+        </sql>
+    </changeSet>
+    <changeSet id="7" author="siryne"  >
+        <sql> DELETE from param_achat.[Compteur_Pharmacie] where type_bon='TBC'</sql>       
+       
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('PH'
+            ,'PHTCB22'
+            ,'000001'
+            ,9
+            ,'TCB')
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('UU'
+            ,'UUTCB22'
+            ,'000001'
+            ,9
+            ,'TCB')
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('EC'
+            ,'ECTCB22'
+            ,'000001'
+            ,9
+            ,'TCB')
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('IMMO'
+            ,'FATCB22'
+            ,'000001'
+            ,9
+            ,'TCB')
+        </sql>
+    </changeSet>
+    <changeSet id="8" author="siryne"  >
+        <sql> 
+         
+            CREATE TABLE [param_achat].[ajustement_transfert_branch_company](
+            [numbon] [nvarchar](20) NOT NULL,
+            [code_article] [bigint] NOT NULL,
+            [code_unite] [bigint] NOT NULL,
+            [numbon_retour] [nvarchar](20) NOT NULL,
+            [code_depot] [bigint] NOT NULL,
+            [diff_mnt_ht] [numeric](18, 3) NOT NULL,
+            [diff_mnt_ttc] [numeric](18, 3) NOT NULL,
+            [integrer] [bit] NOT NULL,
+            [Num_Vir] [nvarchar](10) NULL,
+            [Cod_ecr] [nvarchar](10) NULL,
+            CONSTRAINT [PK_ajustement_transfert_branch_company] PRIMARY KEY CLUSTERED 
+            (
+            [numbon] ASC,
+            [code_article] ASC,
+            [code_unite] ASC,
+            [numbon_retour] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[ajustement_transfert_branch_company] ADD  DEFAULT ((0)) FOR [integrer]
+            ALTER TABLE [param_achat].[ajustement_transfert_branch_company] ADD  DEFAULT ('') FOR [Num_Vir]
+            ALTER TABLE [param_achat].[ajustement_transfert_branch_company] ADD  DEFAULT ('') FOR [Cod_ecr]
+            ALTER TABLE [param_achat].[ajustement_transfert_branch_company]  WITH CHECK ADD  CONSTRAINT [FK_ajustement_transfert_branch_company] FOREIGN KEY([numbon_retour])
+            REFERENCES [param_achat].[transfert_company_branch] ([num_bon])
+            ALTER TABLE [param_achat].[ajustement_transfert_branch_company] CHECK CONSTRAINT [FK_ajustement_transfert_branch_company]
+        </sql>
+    </changeSet> 
+    
+ 
+    <changeSet id="9" author="sirine">       
+        
+        <sql>
+            alter table param_achat.transfert_company_branch add returned_to_supplier bit 
+            alter table param_achat.transfert_company_branch_aud add returned_to_supplier bit
+        </sql>
+    </changeSet>
+    
+    
+    <changeSet id="10" author="sirine">       
+        
+        <sql>
+            ALter table param_achaT.TRANSFERT_company_branch_aud alter  column num_affiche nvarchar(20)
+            ALter table param_achaT.TRANSFERT_company_branch alter  column num_affiche nvarchar(20)
+        </sql>
+        <sql>
+            alter table param_achat.transfert_company_branch add onshelf bit 
+            alter table param_achat.transfert_company_branch_aud add onshelf bit 
+        </sql>
+        <sql>
+            alter table param_achat.avoir_fournisseur add numbon_retour_company_branch nvarchar (20)
+            alter table param_achat.param_achat.avoir_fournisseur_aud add numbon_retour_company_branch nvarchar (20) 
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,0 +1,881 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+ 
+    <changeSet id="1" author="siryne"  >       
+        <sql>
+            alter table param_achat.factureBA 
+            add max_delai_paiement int null 
+        </sql>            
+    </changeSet>
+    
+    <changeSet id="2" author="siryne" >  
+        <sql>
+            alter table param_achat.facture_bon_reception 
+            add max_delai_paiement int null
+        </sql>            
+    </changeSet>       
+    
+    <changeSet id="3" author="sirine"   >  
+        <sql>
+            Alter table param_achat.MvtstoPR alter column lot_inter nvarchar(50) null
+        </sql>            
+    </changeSet>
+    
+    <changeSet id="4" author="sirine"   >  
+        <sql> 
+            drop table param_achat.detail_MvtStoAF
+            drop table param_achat.mvtstoAF
+            drop table param_achat.base_tva_avoir_fournisseur
+            drop table param_achat.ajustement_avoir_fournisseur
+            drop table param_achat.avoir_fournisseur
+ 
+        </sql>            
+    </changeSet>
+    
+    <changeSet id="5" author="sirine">  
+        <sql> 
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('PH'
+            ,'PHAF19'
+            ,'000001'
+            ,9
+            ,'AF')
+
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('UU'
+            ,'UUAF19'
+            ,'000001'
+            ,9
+            ,'AF')
+   
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES
+            ('EC'
+            ,'ECAF19'
+            ,'000001'
+            ,9
+            ,'AF')
+        </sql>            
+    </changeSet> 
+    
+    <changeSet id="6" author="sirine">  
+        <sql> 
+            CREATE TABLE [param_achat].[avoir_fournisseur](
+            [numbon] [nvarchar](20) NOT NULL,
+            [numaffiche] [nvarchar](20) NOT NULL,
+            [typbon] [nvarchar](10) NOT NULL,
+            [categ_depot] [nvarchar](5) NOT NULL,
+            [code_fournisseur] [nvarchar](50) NOT NULL,
+            [date_fournisseur] [date] NOT NULL,
+            [reference_fournisseur] [nvarchar](50) NOT NULL,
+            [codvend] [varchar](50) NOT NULL,
+            [coddep] [int] NOT NULL,
+            [num_facture_bon_recep] [nvarchar](20) NULL,
+            [datesys] [datetime] NOT NULL,
+            [heuresys] [datetime] NOT NULL,
+            [datbon] [datetime] NOT NULL,
+            [montant] [decimal](18, 2) NOT NULL,
+            [user_annule] [nvarchar](50) NULL,
+            [date_annule] [datetime] NULL,
+            [integrer] [bit] NOT NULL,
+            [Num_Vir] [nvarchar](10) NOT NULL,
+            [Cod_ecr] [nvarchar](10) NOT NULL,
+            [memo] [nvarchar](140) NULL,
+            CONSTRAINT [PK_avoir_fournisseur] PRIMARY KEY CLUSTERED 
+            (
+            [numbon] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[avoir_fournisseur] ADD  DEFAULT ((0)) FOR [integrer]
+
+
+            ALTER TABLE [param_achat].[avoir_fournisseur] ADD  DEFAULT ('') FOR [Num_Vir]
+
+
+            ALTER TABLE [param_achat].[avoir_fournisseur] ADD  DEFAULT ('') FOR [Cod_ecr]
+
+
+            ALTER TABLE [param_achat].[avoir_fournisseur]  WITH CHECK ADD  CONSTRAINT [FK_FactureAF_facture_bon_reception] FOREIGN KEY([num_facture_bon_recep])
+            REFERENCES [param_achat].[facture_bon_reception] ([numbon])
+
+
+            ALTER TABLE [param_achat].[avoir_fournisseur] CHECK CONSTRAINT [FK_FactureAF_facture_bon_reception]
+
+
+
+ 
+            CREATE TABLE [param_achat].[ajustement_avoir_fournisseur](
+            [numbon] [nvarchar](20) NOT NULL,
+            [codart] [bigint] NOT NULL,
+            [code_unite] [bigint] NOT NULL,
+            [num_retour] [nvarchar](20) NOT NULL,
+            [code_depot] [bigint] NOT NULL,
+            [diff_mnt_ht] [numeric](18, 3) NOT NULL,
+            [diff_mnt_ttc] [numeric](18, 3) NOT NULL,
+            CONSTRAINT [PK_ajustement_avoir_fournisseur] PRIMARY KEY CLUSTERED 
+            (
+            [numbon] ASC,
+            [codart] ASC,
+            [code_unite] ASC,
+            [num_retour] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[ajustement_avoir_fournisseur]  WITH CHECK ADD  CONSTRAINT [FK_ajustement_avoir_fournisseur_avoir_fournisseur] FOREIGN KEY([num_retour])
+            REFERENCES [param_achat].[avoir_fournisseur] ([numbon])
+
+
+            ALTER TABLE [param_achat].[ajustement_avoir_fournisseur] CHECK CONSTRAINT [FK_ajustement_avoir_fournisseur_avoir_fournisseur]
+
+            
+
+            CREATE TABLE [param_achat].[base_tva_avoir_fournisseur](
+            [avoir_fournisseur] [nvarchar](20) NOT NULL,
+            [code_tva] [int] NOT NULL,
+            [taux_tva] [decimal](18, 3) NULL,
+            [base_tva] [decimal](18, 7) NULL,
+            [montant_tva] [decimal](18, 7) NULL,
+            [code] [bigint] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [mnt_tva_grtauite] [decimal](18, 7) NULL,
+            [base_tva_gratuite] [decimal](18, 7) NULL,
+            CONSTRAINT [PK_base_tva_avoir_fournisseur] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[base_tva_avoir_fournisseur]  WITH CHECK ADD  CONSTRAINT [FK_base_tva_avoir_fournisseur_avoir_fournisseur] FOREIGN KEY([avoir_fournisseur])
+            REFERENCES [param_achat].[avoir_fournisseur] ([numbon])
+
+
+            ALTER TABLE [param_achat].[base_tva_avoir_fournisseur] CHECK CONSTRAINT [FK_base_tva_avoir_fournisseur_avoir_fournisseur]
+
+ 
+            
+                                  
+            CREATE TABLE [param_achat].[mvtstoAF](
+            [code] [bigint] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [codart] [bigint] NOT NULL,
+            [numbon] [nvarchar](20) NOT NULL,
+            [lot_inter] [nvarchar](17) NULL,
+            [DatPer] [datetime] NULL,
+            [categ_depot] [nvarchar](10) NULL,
+            [code_saisi] [nvarchar](50) NOT NULL,
+            [code_unite] [int] NOT NULL,
+            [desart_sec] [nvarchar](255) NOT NULL,
+            [desart] [nvarchar](255) NULL,
+            [quantite] [numeric](18, 3) NULL,
+            [priuni] [numeric](18, 8) NOT NULL,
+            [montht] [numeric](18, 3) NULL,
+            [tautva] [numeric](18, 3) NULL,
+            [numbon_reception] [nvarchar](20) NULL,
+            [remise] [decimal](18, 7) NULL,
+            [base_tva] [decimal](18, 7) NULL,
+            [codtva] [int] NULL,
+            CONSTRAINT [PK_MvtStoAF] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[mvtstoAF]  WITH CHECK ADD  CONSTRAINT [FK_MvtStoAF_FactureAF] FOREIGN KEY([numbon])
+            REFERENCES [param_achat].[avoir_fournisseur] ([numbon])
+
+
+            ALTER TABLE [param_achat].[mvtstoAF] CHECK CONSTRAINT [FK_MvtStoAF_FactureAF]
+  
+            
+            
+            CREATE TABLE [param_achat].[detail_MvtStoAF](
+            [code] [bigint] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [code_depsto] [bigint] NOT NULL,
+            [quantite_disponible] [decimal](18, 3) NOT NULL,
+            [quantite_prelevee] [decimal](18, 3) NOT NULL,
+            [numbon] [nvarchar](50) NULL,
+            [lot_inter] [nvarchar](50) NULL,
+            [DatPer] [datetime] NULL,
+            [priuni] [numeric](18, 3) NULL,
+            [unite] [int] NULL,
+            [datesys] [datetime] NULL,
+            [code_mvtsto] [bigint] NULL,
+            [code_tva] [int] NULL,
+            [taux_tva] [numeric](18, 3) NULL,
+            CONSTRAINT [PK_detail_MvtStoAF] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[detail_MvtStoAF]  WITH CHECK ADD  CONSTRAINT [FK_P1] FOREIGN KEY([code_mvtsto])
+            REFERENCES [param_achat].[mvtstoAF] ([code])
+
+
+            ALTER TABLE [param_achat].[detail_MvtStoAF] CHECK CONSTRAINT [FK_P1]
+                              
+        </sql>            
+    </changeSet> 
+    
+    <changeSet id="7" author="sirine">  
+        <sql>            
+            update  param_achat.FactureBA set max_delai_paiement =( select max(delai_paiement) from demande.commande_achat_mode_reglement c INNEr join param_achat.reception_detail_ca r
+            on c.code_ca = r.commande_achat where param_achat.FactureBA.numbon= r.reception)     
+        </sql>            
+    </changeSet>          
+ 
+    <changeSet id="8" author="sirine">  
+        <sql>            
+            alter table param_achat.mvtstoAF ADD  pmp_precedant decimal (18,3) null
+            alter table param_achat.mvtstoAF ADD  quantite_precedante numeric (18,3) null    
+        </sql>            
+    </changeSet>                          
+ 
+ 
+    <changeSet id="9" author="sirine">  
+        <sql> 
+            alter table param_achat.detail_mvtstoAF add  stkrel numeric (18,3) null                                                
+        </sql>            
+    </changeSet> 
+      
+    <changeSet id="10" author="khouloud">  
+        <sql> 
+            CREATE TABLE [param_achat].[facture_retour_perime](
+            [numbon] [nvarchar](20) NOT NULL,
+            [numaffiche] [nvarchar](20) NOT NULL,
+            [montant_ttc] [decimal](18, 2) NOT NULL,
+            [code_fournisseur] [nvarchar](50) NOT NULL,
+            [date_fournisseur] [date] NOT NULL,
+            [reference_fournisseur] [nvarchar](50) NOT NULL,
+            [codvend] [varchar](50) NOT NULL,
+            [datesys] [datetime] NOT NULL,
+            [heuresys] [datetime] NOT NULL,
+            [datbon] [datetime] NOT NULL,
+            [typbon] [nvarchar](10) NOT NULL,
+            [categ_depot] [nvarchar](5) NOT NULL,
+            [user_annule] [nvarchar](50) NULL,
+            [date_annule] [datetime] NULL,
+            [integrer] [bit] NOT NULL DEFAULT ((0)),
+            [num_vir] [nvarchar](10) NOT NULL DEFAULT (''),
+            [code_ecr] [nvarchar](10) NOT NULL DEFAULT (''),
+            CONSTRAINT [PK_facture_retour_perime] PRIMARY KEY CLUSTERED 
+            (
+            [numbon] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+        </sql> 
+        <sql>
+            CREATE TABLE [param_achat].[base_tva_facture_retour_perime](
+            [code] [bigint] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [facture_retour_perime] [nvarchar](20) NOT NULL,
+            [code_tva] [int] NOT NULL,
+            [taux_tva] [decimal](18, 3) NULL,
+            [base_tva] [decimal](18, 7) NULL,
+            [montant_tva] [decimal](18, 7) NULL,
+            CONSTRAINT [PK_base_tva_facture_retour_perime] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+
+            ALTER TABLE [param_achat].[base_tva_facture_retour_perime]  WITH CHECK ADD  CONSTRAINT [FK_base_tva_facture_retour_perime_facture_retour_perime] FOREIGN KEY([facture_retour_perime])
+            REFERENCES [param_achat].[facture_retour_perime] ([numbon])
+
+            ALTER TABLE [param_achat].[base_tva_facture_retour_perime] CHECK CONSTRAINT [FK_base_tva_facture_retour_perime_facture_retour_perime]
+        </sql>
+        <sql>
+            ALTER TABLE  [param_achat].[retour_perime]
+            ADD num_facture_retour_perime [nvarchar](20) CONSTRAINT [FK_retour_perime_facture_retour_perime] FOREIGN KEY([num_facture_retour_perime])
+            REFERENCES [param_achat].[facture_retour_perime] ([numbon])
+        </sql>                 
+    </changeSet> 
+    
+    <changeSet id="11" author="khouloud">
+        <sql>
+            CREATE TABLE [param_achat].[facture_directe_mode_reglement](
+            [num_bon] [nvarchar](20) NOT NULL,
+            [code_reg] [int] NOT NULL,
+            [code_motif_paiement] [int] NOT NULL,
+            [delai_paiement] [int] NULL,
+            [delai_valeur_paiement] [int] NULL,
+            [pourcentage] [int] NULL,
+            CONSTRAINT [PK_facture_directe_mode_reglement] PRIMARY KEY CLUSTERED 
+            (
+            [num_bon] ASC,
+            [code_reg] ASC,
+            [code_motif_paiement] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+            ALTER TABLE [param_achat].[facture_directe_mode_reglement]  WITH CHECK ADD  CONSTRAINT [FK_facture_directe_mode_reglement_facture_directe] FOREIGN KEY([num_bon])
+            REFERENCES [param_achat].[facture_directe] ([numbon])
+
+            ALTER TABLE [param_achat].[facture_directe_mode_reglement] CHECK CONSTRAINT [FK_facture_directe_mode_reglement_facture_directe]
+        </sql>
+    </changeSet>
+    <changeSet id="12" author="khouloud">
+        <sql>
+            ALTER TABLE param_achat.factureAV ADD [codeSociete] [int] NULL
+            ALTER TABLE param_achat.factureAV ADD [remise_conventionnelle_pharmacie] [nvarchar](1) NULL
+            ALTER TABLE param_achat.factureAV_aud ADD [codeSociete] [int] NULL
+            ALTER TABLE param_achat.factureAV_aud ADD [remise_conventionnelle_pharmacie] [nvarchar](1) NULL
+        </sql>
+    </changeSet>
+    
+    <changeSet id="13" author="marwen">
+        <sql>
+            ALTER TABLE param_achat.facture ADD hashCode binary(512) NULL
+            ALTER TABLE param_achat.facture_aud ADD hashCode binary(512) NULL
+            ALTER TABLE param_achat.factureAV ADD hashCode binary(512) NULL
+            ALTER TABLE param_achat.factureAV_aud ADD hashCode binary(512) NULL
+            
+            
+        </sql>
+    </changeSet>    
+    
+    <changeSet id="14" author="khouloud">
+        <sql>
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('11','edition','بيانات و إحصائيات','mouvement_stock_by_depot','حركة المخزون على مستوى المخزن','06','','26')
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('4','edition','بيانات و إحصائيات','mouvement_stock_by_depot','حركة المخزون على مستوى المخزن','06','','26')
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('5','edition','بيانات و إحصائيات','mouvement_stock_by_depot','حركة المخزون على مستوى المخزن','06','','26')
+        </sql>
+    </changeSet>
+
+    <changeSet id="15" author="siryne">
+        <sql>
+            alter table param_achat.depsto add numbon_origin nvarchar(20) 
+        </sql>
+        <sql>
+            alter table param_achat.depsto_aud add numbon_origin nvarchar(20)
+        </sql>
+      
+         
+        <sql>
+            alter table param_achat.detail_MvtStoBT  add numbon_origin nvarchar(20)   
+        </sql>
+         
+        <sql>  
+            alter table param_achat.detail_MvtStoBE  add numbon_origin nvarchar(20)             
+        </sql>     
+       
+        <sql>
+            alter table param_achat.detail_MvtStoPR add numbon_origin nvarchar(20)
+        </sql>
+        <sql>
+            alter table param_achat.detail_MvtStoAF add numbon_origin nvarchar(20)  
+        </sql>
+        <sql>
+            alter table param_achat.detail_MvtStoBA  add numbon_origin nvarchar(20) 
+        </sql> 
+        <sql>
+            alter table param_achat.detail_MvtStoRetour_perime add numbon_origin nvarchar(20)   
+        </sql>
+    </changeSet>
+    <changeSet id="16" author="siryne">
+        <sql>
+            alter table param_achat.facturePr add  code_cost_center int
+        </sql>
+        <sql>
+            alter table param_achat.retour_prelevement add  code_cost_center int
+        </sql>
+    </changeSet>
+    <changeSet id="17" author="siryne">
+        <sql>
+            alter table param_achat.facture add  code_cost_center int
+        </sql>
+        <sql>
+            alter table param_achat.facture_AUD add  code_cost_center int
+        </sql>
+        <sql>
+            alter table param_achat.factureAV add  code_cost_center int
+        </sql>
+        <sql>
+            alter table param_achat.FactureAV_AUD add  code_cost_center int
+        </sql>
+    </changeSet>
+    <changeSet id="18" author="khouloud">
+        <sql>
+            ALTER TABLE param_achat.DepSto_Hist ALTER COLUMN unite_designation nvarchar(150) NULL
+            ALTER TABLE param_achat.DepSto_Hist ALTER COLUMN unite_designation_Ar nvarchar(150) NULL
+            ALTER TABLE param_achat.DepSto_Hist ALTER COLUMN categorie_article_designation_Ar nvarchar(150) NULL
+            ALTER TABLE param_achat.DepSto_Hist ALTER COLUMN categorie_article_designation nvarchar(150) NULL
+        </sql>
+    </changeSet>
+    <changeSet id="19" author="khouloud">
+        <sql>
+            ALTER TABLE param_achat.depsto DROP COLUMN QtePerime
+            ALTER TABLE param_achat.depsto_hist DROP COLUMN QtePerime
+        </sql>
+    </changeSet>
+    
+    <changeSet id="20" author="siryne">
+        <sql>
+            alter table param_achat.facture_bon_reception add  code_devise nvarchar(10) 
+        </sql>
+        <sql>
+            alter table param_achat.facture_bon_reception add  taux_devise numeric(18,3) 
+        </sql>
+        <sql>    
+            alter table param_achat.facture_bon_reception add  montant_en_devise numeric(18,3) 
+        </sql>
+        
+        <sql>
+            alter table param_achat.facture_directe add  code_devise nvarchar(10)  
+        </sql>
+        <sql>
+            alter table param_achat.facture_directe add  taux_devise numeric(18,3) 
+        </sql>
+        <sql>    
+            alter table param_achat.facture_directe add  montant_en_devise numeric(18,3) 
+        </sql>     
+    </changeSet>
+    
+    <changeSet id="21" author="siryne">
+        <sql>
+            alter table param_achat.fcptfrs add  code_devise nvarchar(10)  
+        </sql>
+        <sql>
+            alter table param_achat.fcptfrs add  taux_devise numeric(18,3) 
+        </sql>
+        <sql>    
+            alter table param_achat.fcptfrs add  montant_en_devise numeric(18,3) 
+        </sql>
+        
+    </changeSet>
+    <changeSet id="22" author="khouloud">
+        <sql>
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('4','edition','بيانات و إحصائيات','rotation_stock_by_depot',' معدل دوران الصنف على مستوى المخزن','06','','29')
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('5','edition','بيانات و إحصائيات','rotation_stock_by_depot',' معدل دوران الصنف على مستوى المخزن','06','','29')
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('11','edition','بيانات و إحصائيات','rotation_stock_by_depot',' معدل دوران الصنف على مستوى المخزن','06','','29')
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('17','edition','بيانات و إحصائيات','rotation_stock_by_depot',' معدل دوران الصنف على مستوى المخزن','06','','29')
+        </sql>
+    </changeSet>
+    <changeSet id="23" author="siryne">
+        <sql>
+            update param_achat.facture_bon_reception set code_devise='EGP'
+            update param_achat.facture_bon_reception set taux_devise=1
+            update param_achat.facture_bon_reception set montant_en_devise=montant
+
+            update param_achat.facture_directe set code_devise='EGP'
+            update param_achat.facture_directe set taux_devise=1
+            update param_achat.facture_directe set montant_en_devise=montant    
+            
+        </sql>
+    </changeSet>
+    <changeSet id="24" author="khouloud">
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES ('PH','ROP20','000001',9,'ROP')
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES ('UU','ROP20','000001',9,'ROP')
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES ('EC','ROP20','000001',9,'ROP')
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES ('IMMO','ROP20','000001',9,'ROP')
+        </sql>
+    </changeSet>
+    <changeSet id="25" author="khouloud">
+        <sql>
+            CREATE TABLE [param_achat].[article_reorder_point](
+            [code] [int] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [code_saisie] [varchar](255) NOT NULL,
+            [date_du_reference] [datetime2](7) NULL,
+            [date_au_reference] [datetime2](7) NULL,
+            [date_create] [datetime2](7) NULL,
+            [user_create] [varchar](255) NOT NULL,
+            [days_consumming] [numeric](18, 3) NOT NULL,
+            [categ_depot] [nvarchar](4) NULL,
+            CONSTRAINT [PK__article___357D4CF8BD6492E2] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+        </sql>
+        <sql>
+            CREATE TABLE [param_achat].[article_reorder_point_AUD](
+            [code] [int] NOT NULL,
+            [rev] [int] NOT NULL,
+            [revtype] [tinyint] NULL,
+            [code_saisie] [varchar](255) NOT NULL,
+            [date_du_reference] [datetime2](7) NULL,
+            [date_au_reference] [datetime2](7) NULL,
+            [date_create] [datetime2](7) NULL,
+            [user_create] [varchar](255) NOT NULL,
+            [days_consumming] [numeric](18, 3) NOT NULL,
+            [categ_depot] [nvarchar](4) NULL,
+            CONSTRAINT [PK__article___357D4CF89E9E52CB] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC,
+            [rev] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+            ALTER TABLE [param_achat].[article_reorder_point_AUD]  WITH CHECK ADD  CONSTRAINT [FK_article_reorder_point_AUD_revision] FOREIGN KEY([rev])
+            REFERENCES [param_achat].[revision] ([id])
+
+            ALTER TABLE [param_achat].[article_reorder_point_AUD] CHECK CONSTRAINT [FK_article_reorder_point_AUD_revision]
+        </sql>
+        <sql>
+            CREATE TABLE [param_achat].[detail_article_reorder_point](
+            [code] [bigint] IDENTITY(1,1) NOT FOR REPLICATION NOT NULL,
+            [code_article_rop] [int] NOT NULL,
+            [code_article] [bigint] NOT NULL,
+            [code_unite] [bigint] NOT NULL,
+            [safety_stock_per_day] [int] NOT NULL,
+            [lead_time_procurement] [int] NOT NULL,
+            [real_consumming] [numeric](18, 3) NULL,
+            [consuming_per_day] [numeric](18, 3) NULL,
+            [lead_time] [decimal](18, 3) NULL,
+            [safety_stock] [numeric](18, 3) NULL,
+            [rop] [numeric](18, 3) NULL,
+            [safety_stock_per_days_consumming] [numeric](18, 3) NULL,
+            [maximum_stock] [numeric](18, 3) NULL,
+            [current_stock] [numeric](18, 3) NULL,
+            CONSTRAINT [PK_detail_article_reorder_point] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+            ALTER TABLE [param_achat].[detail_article_reorder_point]  WITH CHECK ADD  CONSTRAINT [FK_detail_article_reorder_point_article_reorder_point1] FOREIGN KEY([code_article_rop])
+            REFERENCES [param_achat].[article_reorder_point] ([code])
+
+            ALTER TABLE [param_achat].[detail_article_reorder_point] CHECK CONSTRAINT [FK_detail_article_reorder_point_article_reorder_point1]
+        </sql>
+        <sql>
+            CREATE TABLE [param_achat].[detail_article_reorder_point_AUD](
+            [code] [bigint] NOT NULL,
+            [rev] [int] NOT NULL,
+            [revtype] [tinyint] NULL,
+            [code_article_rop] [int] NULL,
+            [code_article] [bigint] NULL,
+            [code_unite] [bigint] NULL,
+            [safety_stock_per_day] [int] NULL,
+            [lead_time_procurement] [int] NULL,
+            [real_consumming] [bigint] NULL,
+            [consuming_per_day] [numeric](18, 3) NULL,
+            [lead_time] [decimal](18, 3) NULL,
+            [safety_stock] [numeric](18, 3) NULL,
+            [rop] [numeric](18, 3) NULL,
+            [safety_stock_per_days_consumming] [numeric](18, 3) NULL,
+            [maximum_stock] [numeric](18, 3) NULL,
+            [current_stock] [numeric](18, 3) NULL,
+            CONSTRAINT [PK_detail_article_reorder_point_AUD] PRIMARY KEY CLUSTERED 
+            (
+            [code] ASC,
+            [rev] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+
+            ALTER TABLE [param_achat].[detail_article_reorder_point_AUD]  WITH CHECK ADD  CONSTRAINT [FK_detail_article_reorder_point_AUD_revision1] FOREIGN KEY([rev])
+            REFERENCES [param_achat].[revision] ([id])
+
+            ALTER TABLE [param_achat].[detail_article_reorder_point_AUD] CHECK CONSTRAINT [FK_detail_article_reorder_point_AUD_revision1]
+        </sql>
+    </changeSet>
+    <changeSet id="26" author="khouloud">
+        <sql>
+            ALTER TABLE param_achat.inventaire add demarrage BIT default 0
+        </sql>
+    </changeSet>
+    <changeSet id="27" author="khouloud">
+        <sql>
+            ALTER TABLE param_achat.facture ADD code_operation int NULL
+        </sql>
+        <sql>
+            ALTER TABLE param_achat.facture_AUD ADD code_operation int NULL
+        </sql>
+    </changeSet>
+    <changeSet id="28" author="khouloud">
+        <sql>
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('M12','form_Modal_InitialiserInventaire','بداية جرد','modificationTypeInventairePH','طبيعة الجرد','2001','','0')
+        </sql>
+        <sql>
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('M12','form_Modal_InitialiserInventaire','بداية جرد','modificationTypeInventaireUU','طبيعة الجرد','2002','','0')
+        </sql>
+        <sql>
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('M12','form_Modal_InitialiserInventaire','بداية جرد','modificationTypeInventaireEC','طبيعة الجرد','2003','','0')
+        </sql>
+        <sql>
+            INSERT INTO [Access].[FORM]([MODULE],[FORM],[NOMFORM],[CONTROL],[NOMCONTROL],[CODE_MENU],[LOGO],[ORDER_BUTTON])
+            VALUES ('M12','form_Modal_InitialiserInventaire','بداية جرد','modificationTypeInventaireIMMO','طبيعة الجرد','2004','','0')  
+        </sql>
+    </changeSet>
+    <changeSet id="29" author="khouloud">
+        <sql>
+            INSERT INTO access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            VALUES ('91','M12','إلغاء جرد','annulationInventaire','fas fa-times','Annulation inventaire') 
+        </sql>
+        <sql>
+            INSERT INTO access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            VALUES ('9101','M12','الادوية الطبية','annulationInventaire/PH','fas fa-pills','Medicament') 
+        </sql>
+        <sql>
+            INSERT INTO access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            VALUES ('9102','M12','المستلزمات الطبية','annulationInventaire/UU','fas fa-syringe','Usage Unique')
+        </sql>
+        <sql> 
+            INSERT INTO access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            VALUES ('9103','M12','المستهلكات','annulationInventaire/EC','fas fa-archive','Economat') 
+        </sql>
+        <sql>
+            INSERT INTO access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            VALUES ('9104','M12','الأصول','annulationInventaire/IMMO','fa-pencil','Immobilisation') 
+        </sql>
+    </changeSet>
+    <changeSet id="30" author="khouloud">
+        <sql>
+            ALTER TABLE [param_achat].[inventaire] ADD [user_annule] [nvarchar](50) NULL
+            ALTER TABLE [param_achat].[inventaire] ADD [date_annule] [datetime] NULL 
+        </sql>
+    </changeSet>
+    <changeSet id="28" author="sirine">
+        <sql>
+            alter table param_achat.mvtstoba add ancien_prix_achat numeric (18,7)
+        </sql>
+        <sql>
+            update param_achat.mvtstoba set ancien_prix_achat = prix_achat from param_achat.article where codart=code 
+        </sql>
+        <sql>
+            alter table param_achat.motif_demande_redressement add regener_pmp bit
+        </sql>
+        <sql>
+            update param_achat.motif_demande_redressement set regener_pmp =1 where correction_lot=0 
+        </sql>
+        
+    </changeSet>
+    <changeSet id="31" author="khouloud">
+        <sql>
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('1004','M12','الأصول','etatInventaireVierge/IMMO','fa-pencil','Immobilisation') 
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('2004','M12','الأصول','initialiserInventaire/IMMO','fa-pencil','Immobilisation') 
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('3004','M12','الأصول','saisieInventaire/IMMO','fa-pencil','Immobilisation') 
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('400104','M12','الأصول','impressionAvantValidation/etatEcarts/IMMO','fa-pencil','Immobilisation') 
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('6004','M12','الأصول','validerInventaire/IMMO','fa-pencil','Immobilisation')
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('7004','M12','الأصول','ajoutArticle/IMMO','fa-pencil','Immobilisation')  
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('800104','M12','الأصول','impression/EtatInventaire/IMMO','fa-pencil','Immobilisation')  
+            insert into access.menup (CODMNP,MODULE,DESMENUP,MNNAME,logo,DESMENUPSEC) 
+            values ('800204','M12','الأصول','impression/EtatEcarts/IMMO','fa-pencil','Immobilisation') 
+        </sql>
+        <sql>
+            INSERT INTO [param_achat].[Compteur_Pharmacie]  ([code_depot] ,[P1] ,[P2] ,[long] ,[type_bon])
+            VALUES ('IMMO','FAIN20','00001',5,'IN')
+        </sql>
+    </changeSet>
+    <changeSet id="32" author="khouloud">
+        <sql>
+            ALTER TABLE [param_achat].[DepSto_Hist] ADD [code_depsto] [bigint] NULL
+        </sql>
+        <sql>
+            ALTER TABLE [param_achat].[DepSto_Hist]  WITH CHECK ADD  CONSTRAINT [FK_depsto_DepSto_Hist] FOREIGN KEY([code_depsto])
+            REFERENCES [param_achat].[depsto] ([code])
+        </sql>
+        <sql>
+            ALTER TABLE [param_achat].[DepSto_Hist] add numbon_origin_depsto nvarchar(20) 
+        </sql>
+        <sql>
+            ALTER TABLE [param_achat].[DepSto_Hist] add numbon_depsto nvarchar(20) 
+        </sql>
+    </changeSet>
+    
+    <changeSet id="33" author="khouloud">
+        <sql>
+            DELETE FROM [Access].[FORM] WHERE MODULE = 'M12' AND FORM = 'form_Modal_InitialiserInventaire' AND CODE_MENU ='2004'
+        </sql>
+        <sql>
+            DELETE FROM access.menup where MODULE = 'M12' AND CODMNP = '7004'
+        </sql>
+    </changeSet>
+    <changeSet id="34" author="khouloud">
+        <sql>
+            alter table param_achat.depsto add numbon_before_inventaire nvarchar(20) 
+        </sql>
+        <sql>
+            alter table param_achat.depsto_aud add numbon_before_inventaire nvarchar(20)
+        </sql>
+    </changeSet>
+    <changeSet id="35" author="khouloud">
+        <sql>
+            INSERT [Access].[MENUP] ([CODMNP], [MODULE], [DESMENUP], [MNNAME], [logo], [DESMENUPSEC])
+            VALUES ('11', '5', 'طباعة الرمز الشريطي', 'ImprCodeBarre', 'fas fa-qrcode', 'Bar code printing')
+        </sql>
+    </changeSet>
+    <changeSet id="36" author="khouloud">
+        <sql>
+            alter table param_achat.facture add code_cost_center_analytique int null
+        </sql>
+        <sql>
+            alter table param_achat.facture_aud add code_cost_center_analytique int null
+        </sql>
+    </changeSet>
+    <changeSet id="37" author="khouloud">
+        <sql>
+            CREATE TABLE [param_achat].[consommation_reelle_for_rop](
+            [code] [int] IDENTITY(1,1) NOT NULL,
+            [id] [nvarchar](257) NULL,
+            [typbon] [nvarchar](3) NULL,
+            [codart] [bigint] NOT NULL,
+            [numbon] [nvarchar](20) NOT NULL,
+            [numaffiche] [nvarchar](20) NULL,
+            [codTvaAch] [int] NULL,
+            [tauTvaAch] [numeric](18, 3) NULL,
+            [priach] [numeric](20, 7) NULL,
+            [desart] [nvarchar](255) NULL,
+            [desArtSec] [nvarchar](255) NOT NULL,
+            [codeSaisi] [nvarchar](50) NOT NULL,
+            [quantite] [decimal](18, 3) NULL,
+            [coddep] [int] NOT NULL,
+            [designationDepot] [nvarchar](50) NULL,
+            [designationDepotSec] [nvarchar](50) NOT NULL,
+            [codeUnite] [int] NOT NULL,
+            [designationUnite] [varchar](150) NOT NULL,
+            [designationUniteSec] [varchar](150) NOT NULL,
+            [date] [datetime] NULL,
+            [categ_depot] [nvarchar](10) NULL,
+            CONSTRAINT [PK_consommation_reelle_for_rop] PRIMARY KEY CLUSTERED
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+        </sql>
+        <sql>
+            CREATE TABLE [param_achat].[article_reorder_point_planning](
+            [code] [int] IDENTITY(1,1) NOT NULL,
+            [categ_depot] [nvarchar](10) NULL,
+            [date_du_reference] [datetime] NOT NULL,
+            [date_au_reference] [datetime] NOT NULL,
+            [days_consumming] [numeric](18, 3) NOT NULL,
+            [date_create] [datetime] NOT NULL,
+            [user_create] [nvarchar](50) NOT NULL,
+            [planned] [bit] NOT NULL,
+            [data_prepared] [bit] NOT NULL,
+            [executed] [bit] NOT NULL,
+            CONSTRAINT [PK_article_reorder_point_planning] PRIMARY KEY CLUSTERED
+            (
+            [code] ASC
+            )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+            ) ON [PRIMARY]
+        </sql>
+    </changeSet>
+    <changeSet id="38" author="khouloud">
+        <sql>
+            Alter TABLE [param_achat].[article_reorder_point] ADD code_planing int NULL
+        </sql>
+    </changeSet>
+    <changeSet id="39" author="khouloud">
+        <sql>
+            EXEC sp_rename 'param_achat.valeur_stock_anomalie', 'cron_error';
+        </sql>
+    </changeSet>
+    <changeSet id="40" author="khouloud">
+        <sql>
+            ALTER TABLE param_achat.article_reorder_point_planning ADD ltp_executed bit NULL
+        </sql>
+        <sql>
+            ALTER TABLE param_achat.article_reorder_point_planning ADD std_executed bit NULL
+        </sql>
+    </changeSet>
+    
+    <changeSet id="41" author="mahdi">
+        <sql>
+            INSERT INTO [Access].[FORM]
+            ([MODULE]
+            ,[FORM]
+            ,[NOMFORM]
+            ,[CONTROL]
+            ,[NOMCONTROL]
+            ,[CODE_MENU]
+            ,[LOGO]
+            ,[ORDER_BUTTON])
+            VALUES
+            ('4'
+            ,'edition'
+            ,'بيانات و إحصائيات'
+            ,'liste_facture_directes_avec_cost_center'
+            ,'قائمة فواتير الموردين '
+            ,'06'
+            ,''
+            ,'31')
+        </sql>
+        <sql>
+            INSERT INTO [Access].[FORM]
+            ([MODULE]
+            ,[FORM]
+            ,[NOMFORM]
+            ,[CONTROL]
+            ,[NOMCONTROL]
+            ,[CODE_MENU]
+            ,[LOGO]
+            ,[ORDER_BUTTON])
+            VALUES
+            ('5'
+            ,'edition'
+            ,'بيانات و إحصائيات'
+            ,'liste_facture_directes_avec_cost_center'
+            ,'قائمة فواتير الموردين '
+            ,'06'
+            ,''
+            ,'31')
+        </sql>
+        <sql>
+            INSERT INTO [Access].[FORM]
+            ([MODULE]
+            ,[FORM]
+            ,[NOMFORM]
+            ,[CONTROL]
+            ,[NOMCONTROL]
+            ,[CODE_MENU]
+            ,[LOGO]
+            ,[ORDER_BUTTON])
+            VALUES
+            ('11'
+            ,'edition'
+            ,'بيانات و إحصائيات'
+            ,'liste_facture_directes_avec_cost_center'
+            ,'قائمة فواتير الموردين '
+            ,'06'
+            ,''
+            ,'31')
+        </sql>
+    </changeSet>
+</databaseChangeLog>

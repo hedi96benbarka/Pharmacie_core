@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration scan="true">
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+    <springProfile name="dev">
+        <logger name="com.csys.pharmacie" level="DEBUG"/>
+        <logger name="org.apache" level="WARN"/>
+        <logger name="org.apache.catalina.startup.DigesterFactory" level="OFF"/>
+        <logger name="org.bson" level="WARN"/>   
+        <logger name="org.springframework" level="ERROR"/>
+        <logger name="org.springframework.web" level="ERROR"/>
+        <logger name="sun.net" level="OFF"/>
+        <logger name="org.hibernate.validator" level="OFF"/>
+        <logger name="org.hibernate" level="OFF"/>
+        <logger name="org.hibernate.ejb.HibernatePersistence" level="OFF"/>
+        <logger name="org.hibernate.type.BasicTypeRegistry" level="OFF"/> 
+        <logger name="org.hibernate.type.descriptor.sql.BasicExtractor" level="OFF"/> 
+        <logger name="org.hibernate.stat" level="OFF"/> 
+        <logger name="org.hibernate.type.descriptor.sql" level="OFF"/> 
+        <logger name="com.netflix.hystrix" level="OFF"/> 
+        <logger name="com.csys.util.Preconditions.checkBusinessLogique" level="TRACE"/>
+        <logger name="com.crystaldecisions" level="OFF"/>
+        <logger name="com.crystaldecisions12" level="OFF"/>
+        <logger name="com.crystalreports" level="OFF"/>
+        <logger name="com.businessobjects" level="OFF"/>
+        <logger name="com.businessobjects12" level="OFF"/>
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <springProfile name="prod">
+        <logger name="com.csys.pharmmacie.PharmacieApplication" level="INFO"/>
+        <logger name="com.csys.csysstarter.gracefulshutdown" level="INFO"/>
+        
+        <root level="ERROR">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+    
+</configuration>

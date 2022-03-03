@@ -1,0 +1,19 @@
+
+spring:
+    application:
+        name: pharmacie-core
+#    profiles:
+#        active: 
+    cloud:
+        config:
+            uri: http://config-server:8888
+    sleuth:
+        sampler:
+            percentage: 0.0 
+        web: 
+            skipPattern: (^cleanup.*|/api-docs.*|/autoconfig|/configprops|/dump|/health|/info|/metrics.*|/mappings|/trace|/swagger.*|/webjars.*|/v2.*|.*\\.png|.*\\.css|.*\\.js|.*\\.html|/favicon.ico|/hystrix.stream)
+        scheduled:
+            skipPattern: org.springframework.session.data.redis.RedisOperationsSessionRepository    
+    zipkin:
+        sender:
+            type: web         

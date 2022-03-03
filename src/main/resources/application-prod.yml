@@ -1,0 +1,194 @@
+
+management:
+    security:
+        enabled: false
+security:
+    basic:
+        enabled: false
+liquibase:
+    default-schema: param_achat
+    enabled: true
+    change-log: classpath:db/changelog-master.xml   
+spring:
+    zipkin:
+        base-url: http://zipkin:9411/ 
+    redis: 
+        host: redis
+    devtools:
+        restart:
+            enabled: true
+        livereload:
+            enabled: true
+    jpa:
+        database-platform: org.hibernate.dialect.SQLServer2012Dialect
+        database: SQL_SERVER
+        open-in-view: false
+        show-sql: false
+        hibernate:
+            ddl-auto: none
+            naming:
+                implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+                physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        properties:
+            hibernate.default_schema: param_achat
+            hibernate.id.new_generator_mappings: true
+            hibernate.cache.use_second_level_cache: false
+            hibernate.cache.use_query_cache: false
+            hibernate.generate_statistics: false
+#            hibernate.cache.region.factory_class: com.hazelcast.hibernate.HazelcastCacheRegionFactory
+#            hibernate.cache.hazelcast.instance_name: hazelcast
+            hibernate.cache.use_minimal_puts: true
+            org.hibernate.envers.store_data_at_delete: true
+#            hibernate.cache.hazelcast.use_lite_member: true
+
+    jackson:
+        serialization:
+            write_dates_as_timestamps : false
+    
+    boot:
+      admin:
+        url: http://sba:1111
+                    
+paramAchatService :
+    base-uri : http://parametrage-achat-core/parametrage-achat-core
+    path: /parametrage-achat-core
+    departement : /api/departements
+    depot : /api/depots
+    articles: /api/articles
+    medication : /api/medications
+    medical : /api/medical-items
+    non-medical : /api/assets
+    fournisseurs : /api/fournisseurs
+    catArticle: /api/categorie-articles
+    tvas: /api/tvas
+    unite: /api/unites
+    categorie-article: /api/categorie-articles
+    categorie-depots: /api/categorie-depots
+    immo : /api/immo
+    emplacement: /api/emplacements
+    article-depot: /api/article-depot
+    motif-paiement: /api/motif-paiements 
+    article-non-mouvemente: /api/article-non-mvts
+    motif-demande-redressement: /api/motif-demande-redressement
+    palier-marge-categorie-article: /api/palier-marge-categorie-articles
+    prix-choisi-calcul-prix-vente-uu: pmp
+    injection: /api/injection
+    classification-articles: /api/classification-articles
+    palier-classification-articles: /api/palier-classification-articles
+
+receptionService : 
+    base-uri : http://reception-core/reception-core
+    admission-facturations: /api/admission-facturations
+    findAdmissionByCodeInForDemandePEC: /api/admissions/findAdmissionByCodeInForDemandePEC
+    findSocieteByCodeAdmission: /api/admissions/societe/
+    facturationQuittanceAvoir: /api/detailsadmissions/quittance-pharmacie
+    deleteFacturationByNumQuittance: /api/detailsadmissions/delete-by-num-quittance
+    admissions: /api/admissions/
+paramService :
+    base-uri : http://parametrage-core/parametrage-core
+    cliniques : /api/cliniques
+    chambres : /api/chambres
+    societes : /api/societes
+    remise-price-list-categorie-article : /api/priceliste-par-categorie-article
+    details-panier-prestation : /api/prestations/DetailsPanierBycodePrestation
+    medecins : /api/medecins
+    lits : /api/lits
+    costCenter: /api/cost-profit-centres
+    modeReglement : /api/mode-reglements
+    operations : /api/operations
+    site: /api/sites
+
+demandeService :
+  base-uri : http://demande-core/demande-core
+  commandeachats : /api/commandeachats/searches
+  commandeachatsbycode : /api/commandeachats
+  demandetrs : /api/demandetrs
+  demandeprs : /api/demandeprs
+  commandeachatmodereglements: /api/commande-achat-mode-reglements
+  demanderedressement: /api/demande-redressement
+ 
+caisseService :
+  base-uri : http://caisse-core/caisse-core
+  devises : /api/devises
+cliniSys :
+    base-uri : http://clinisys/CliniSys
+    sendEmails : /api/emails
+    searchEmails: /api/users
+    findUserRole: /api/user-roles
+    findRole: /api/roles
+    senderAdress: clinisys.csh@cleohc.com
+    
+
+immobilisation :
+    base-uri : http://immobilisation-core/immobilisation-core
+    immobilisations : /api/immobilisations                  
+lang:
+    secondary: ar
+default-value-interval-retour-prelevement: 7
+retour-perime.config.expiration-date-interval: 30
+motif-id-transfert-validation: 6
+validation-transfert-auto: false
+default-list-users-to-notify-for-validation-transfert: salma.clinisys,a,farouk.clinisys
+difference-permise-bon-retour: 500000
+max-marge-montant-facture: 0.05
+default-code-motif-paiement-ca: 3
+blockage-sale-price-purchase: true
+blocking-delay-between-quittances: 5
+transfert-perime.config.expiration-date-interval: 90
+max-delay-return-item-thermosensitive: 15
+default-number-of-transferts: 3
+default-number-of-prelevements: 3
+prix-choisi-calcul-prix-vente-uu: prix-reference
+reception-en-deux-etapes : false 
+automatic-receiving : false
+apply-marginal-for-medication-items: false
+transfert-only-with-request: false
+time-of-cron-valeur-stock: '50 59 23 * * *'
+clinic-name: Hikma
+blocking-delay-between-transfert-recup: 5
+time-of-cron-prepare-data-rop-ph: '00 00 01 * * *'
+time-of-cron-excuted-rop-ph: '00 30 01 * * *'
+time-of-cron-prepare-data-rop-uu: '00 00 02 * * *'
+time-of-cron-excuted-rop-uu: '00 30 02 * * *'
+time-of-cron-prepare-data-rop-ec: '00 00 03 * * *'
+time-of-cron-excuted-rop-ec: '00 30 03 * * *'
+time-of-cron-prepare-data-rop-immo: '00 00 04 * * *'
+time-of-cron-excuted-rop-immo: '00 30 04 * * *'
+server:
+    port: 80
+    contextPath: /pharmacie-core
+    
+hystrix:
+    command.default.execution.isolation.strategy: THREAD
+    
+logging:
+    level:
+       com.csys.pharmacie: INFO    
+       com.csys.pharmacie.config.RequestLoggingInterceptor: INFO  
+management.health.mail.enabled : false
+management.health.db.enabled : false
+management.health.redis.enabled : false
+kafka:
+    topic:
+      transfert-bon-reception-onShelf-management: transfert-bon-reception-onShelf-management
+      transfer-company-to-branch-management: transfer-company-to-branch-management
+      transfer-branch-to-company-management: transfer-branch-to-company-management 
+      direct-bill-management-for-accounting: direct-bill-management-for-accounting
+    servers:
+        bootstrap: 172.16.10.30:9092,172.16.10.31:9092,172.16.10.32:9092
+    group_id: pharmacie-core
+http:
+    auth-token-header-name: x-api-key
+    auth-token: c040d610-134a-475d-b0a3-707e300927a5
+context:
+    reception: standard
+    transfert-with-quittance: standard
+    
+mailFrom: soft@csys.com.tn    
+environnement: local     
+code-site: 
+code-company-for-branch: 
+ipAdressSite-csh-ParamAchat: 
+ipAdressSite-csh-Param: 
+ipAdressSite-cleo-ParamAchat:  
+ipAdressSite-cleo-Param:    

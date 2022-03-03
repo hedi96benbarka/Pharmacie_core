@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="com.csys.pharmacie_pharmacie-core_jar_1.5.7.RELEASEPU" transaction-type="RESOURCE_LOCAL">
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.csys.pharmacie.achat.domain.AjustementRetour</class>
+    <class>com.csys.pharmacie.achat.domain.AjustementRetourPerime</class>
+    <class>com.csys.pharmacie.achat.domain.FactureRetourPerime</class>
+    <class>com.csys.pharmacie.achat.domain.BaseTvaFactureRetourPerime</class>
+    <class>com.csys.pharmacie.achat.domain.FactureDirecteModeReglement</class>
+    <class>com.csys.pharmacie.achat.domain.ReceptionTemporaire</class>
+    <class>com.csys.pharmacie.achat.domain.DetailReceptionTemporaire</class>
+    <class>com.csys.pharmacie.achat.domain.BaseTvaReceptionTemporaire</class>
+    <class>com.csys.pharmacie.achat.domain.ReceptionTemporaireDetailCa</class>
+    <class>com.csys.pharmacie.achat.domain.ReceptiontemporairedetailcaAUD</class>
+    <class>com.csys.pharmacie.achat.domain.LeadTimeProcurement</class>
+    <class>com.csys.pharmacie.stock.domain.ArticleReorderPointPlanning</class>
+    <class>com.csys.pharmacie.stock.domain.ConsommationReelleForRop</class>
+    <class>com.csys.pharmacie.achat.domain.TransfertCompanyBranch</class>
+    <class>com.csys.pharmacie.achat.domain.DetailTransfertCompanyBranch</class>
+    <properties>
+      <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://172.16.10.10\sql2014;databaseName=GcliniqueDev"/>
+      <property name="javax.persistence.jdbc.user" value="sa"/>
+      <property name="javax.persistence.jdbc.driver" value="com.microsoft.sqlserver.jdbc.SQLServerDriver"/>
+      <property name="javax.persistence.jdbc.password" value="m0dp@$$"/>
+    </properties>
+  </persistence-unit>
+</persistence>

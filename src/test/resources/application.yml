@@ -1,0 +1,5 @@
+
+liquibase:
+    default-schema: param_achat
+    enabled: false 
+    change-log: classpath:db/changelog-master.xml  

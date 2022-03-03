@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-clenapom</actionName>
+            <displayName>clenapom</displayName>
+            <goals>
+                <goal>dependency:analyze</goal>
+            </goals>
+        </action>
+                <action>
+            <actionName>CUSTOM-weaving</actionName>
+            <displayName>weaving</displayName>
+            <goals>
+                <goal>process-classes</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>CUSTOM-spring-boot:run</actionName>
+            <displayName>spring-boot:run</displayName>
+            <goals>
+                <goal>spring-boot:run</goal>
+            </goals>
+        </action>
+        <action>
+            <actionName>run</actionName>
+            <packagings>
+                <packaging>jar</packaging>
+            </packagings>
+            <goals>
+                <goal>process-classes</goal>
+                <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
+            </goals>
+            <properties>
+                <exec.args>-classpath %classpath com.csys.pharmacie.PharmacieCoreApplication</exec.args>
+                <exec.executable>java</exec.executable>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-spring-boot:run 512m</actionName>
+            <displayName>spring-boot:run 512m</displayName>
+            <goals>
+                <goal>spring-boot:run</goal>
+            </goals>
+            <properties>
+                <run.jvmArguments>"-Xmx512m"</run.jvmArguments>
+            </properties>
+        </action>
+        <action>
+            <actionName>CUSTOM-apt-maven:process</actionName>
+            <displayName>apt-maven:process</displayName>
+            <goals>
+                <goal>apt-maven-plugin:1.1.3:process</goal>
+            </goals>
+        </action>
+    </actions>
