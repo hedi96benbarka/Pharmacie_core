@@ -10,6 +10,8 @@ import com.csys.pharmacie.achat.dto.FactureDirecteDTO;
 import com.csys.pharmacie.achat.dto.TransfertCompanyBranchDTO;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.csys.pharmacie.transfert.dto.FactureBEDTO;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -60,6 +62,15 @@ public class KakfaConfigurationProducer {
     public void setTopicDirectBillManagementForAccounting(String topic) {
         topicDirectBillManagementForAccounting = topic;
     }
+
+    static String topicRedressementBillManagementForAccounting;
+    @Value("${kafka.topic.redressement-bill-management-for-accounting}")
+    public void setTopicRedressementBillManagementForAccounting(String topicRedressementBillManagementForAccounting) {
+        KakfaConfigurationProducer.topicRedressementBillManagementForAccounting = topicRedressementBillManagementForAccounting;
+    }
+
+
+
     
 
     @Bean
@@ -72,11 +83,11 @@ public class KakfaConfigurationProducer {
         config.put(ProducerConfig.ACKS_CONFIG, "all");
         config.put(ProducerConfig.BUFFER_MEMORY_CONFIG, 2000000);//taille buffer
         config.put(ProducerConfig.COMPRESSION_TYPE_CONFIG, "gzip"); //"none"
-        config.put(ProducerConfig.RETRIES_CONFIG, Integer.MAX_VALUE);
+        config.put(ProducerConfig.RETRIES_CONFIG, 1);
         config.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, 2000);
         config.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, 30000);// apres quel time on va faire retry
         config.put(ProducerConfig.METADATA_MAX_AGE_CONFIG, 5000);
-        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, Long.MAX_VALUE);
+        config.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, 1000);
         config.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG, true);//deduplication ==> envoie avec message sequence id => renvoie meme sq id
         //=> brocker prend message si seq id different donc write message qu'une seule fois => exactly-once
         config.put(ProducerConfig.ENABLE_IDEMPOTENCE_DOC, true);
@@ -107,6 +118,11 @@ public class KakfaConfigurationProducer {
     }
  @Bean
     public KafkaTemplate<String, FactureDirecteDTO> kafkaTemplateFactureDirecte() {
+        return new KafkaTemplate<>(producerFactory());
+    }
+
+    @Bean
+    public KafkaTemplate<String, FactureBEDTO> kafkaTemplateFactureBE() {
         return new KafkaTemplate<>(producerFactory());
     }
     @Bean
@@ -142,6 +158,14 @@ public class KakfaConfigurationProducer {
         Map<String, String> config = new HashMap<>();
         config.put(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2");
         return new NewTopic(topicDirectBillManagementForAccounting, 3, (short) 3).configs(config);
+
+    }
+
+    @Bean
+    public NewTopic topicRedressementBillManagementForAccounting() {
+        Map<String, String> config = new HashMap<>();
+        config.put(TopicConfig.MIN_IN_SYNC_REPLICAS_CONFIG, "2");
+        return new NewTopic(topicRedressementBillManagementForAccounting, 3, (short) 3).configs(config);
 
     }
     

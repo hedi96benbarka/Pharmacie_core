@@ -4,7 +4,7 @@ import com.crystaldecisions.sdk.occa.report.lib.ReportSDKException;
 import com.csys.pharmacie.achat.dto.DetailFactureDirecteDTO;
 import com.csys.pharmacie.achat.dto.FactureDirecteDTO;
 import com.csys.pharmacie.achat.service.FactureDirecteService;
-import com.csys.pharmacie.achat.service.KafkaDirectBillManagementForAccounting;
+
 import com.csys.util.RestPreconditions;
 import java.io.IOException;
 import java.lang.String;
@@ -44,13 +44,13 @@ public class FactureDirecteResource {
     private static final String ENTITY_NAME = "facturedirecte";
 
     private final FactureDirecteService facturedirecteService;
-    private final KafkaDirectBillManagementForAccounting kafkaDirectBillManagementForAccounting;
+
 
     private final Logger log = LoggerFactory.getLogger(FactureDirecteService.class);
 
-    public FactureDirecteResource(FactureDirecteService facturedirecteService, KafkaDirectBillManagementForAccounting kafkaDirectBillManagementForAccounting) {
+    public FactureDirecteResource(FactureDirecteService facturedirecteService) {
         this.facturedirecteService = facturedirecteService;
-        this.kafkaDirectBillManagementForAccounting = kafkaDirectBillManagementForAccounting;
+
     }
 
     /**
@@ -74,8 +74,8 @@ public class FactureDirecteResource {
         if (bindingResult.hasErrors()) {
             throw new MethodArgumentNotValidException(null, bindingResult);
         }
-//        FactureDirecteDTO result = facturedirecteService.save(facturedirecteDTO);
-        FactureDirecteDTO result = kafkaDirectBillManagementForAccounting.saveReocrd(facturedirecteDTO);
+           FactureDirecteDTO result = facturedirecteService.save(facturedirecteDTO);
+        //FactureDirecteDTO result = kafkaDirectBillManagementForAccounting.saveReocrd(facturedirecteDTO);
         return ResponseEntity.created(new URI("/api/facturedirectes/" + result.getNumbon())).body(result);
     }
 
@@ -90,6 +90,7 @@ public class FactureDirecteResource {
             throw new MethodArgumentNotValidException(null, bindingResult);
         }
         FactureDirecteDTO result = facturedirecteService.saveWithBonCommande(facturedirecteDTO);
+        //FactureDirecteDTO result = kafkaDirectBillManagementForAccounting.saveRecordWithBonCommande(facturedirecteDTO);
         return ResponseEntity.created(new URI("/api/facturedirectes/" + result.getNumbon())).body(result);
     }
 
@@ -109,6 +110,7 @@ public class FactureDirecteResource {
         log.debug("Request to update FactureDirecte: {}", id);
         facturedirecteDTO.setNumbon(id);
         FactureDirecteDTO result = facturedirecteService.update(facturedirecteDTO);
+        //FactureDirecteDTO result = kafkaDirectBillManagementForAccounting.saveReocrdUpdate(facturedirecteDTO);
         return ResponseEntity.ok().body(result);
     }
 
@@ -178,6 +180,7 @@ public class FactureDirecteResource {
     public ResponseEntity<Void> deleteFactureDirecte(@PathVariable String id) {
         log.debug("Request to delete FactureDirecte: {}", id);
         facturedirecteService.delete(id);
+        //kafkaDirectBillManagementForAccounting.saveReocrdAnnule(id);
         return ResponseEntity.ok().build();
     }
 }

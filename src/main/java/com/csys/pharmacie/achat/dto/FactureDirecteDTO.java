@@ -2,9 +2,20 @@ package com.csys.pharmacie.achat.dto;
 
 import com.csys.pharmacie.client.dto.DeviseDTO;
 import com.csys.pharmacie.helper.CategorieDepotEnum;
+import com.csys.pharmacie.helper.EnumCrudMethod;
 import com.csys.pharmacie.helper.TypeBonEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalTimeSerializer;
+import org.springframework.cglib.core.Local;
+
 import java.lang.String;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -27,6 +38,8 @@ public class FactureDirecteDTO {
     private String designationFournisseur;
 
     @NotNull
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate dateFournisseur;
 
     @NotNull
@@ -46,11 +59,17 @@ public class FactureDirecteDTO {
     private String codvend;
 
     @NotNull
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime datbon;
+//
+//    @JsonSerialize(using = LocalDateSerializer.class)
+//    @JsonDeserialize(using = LocalDateDeserializer.class)
+//    private LocalDate datesys;
 
-    private LocalDate datesys;
-
-    private LocalTime heuresys;
+//    @JsonSerialize(using = LocalTimeSerializer.class)
+//    @JsonDeserialize(using = LocalTimeDeserializer.class)
+//    private LocalTime heuresys;
 
     private TypeBonEnum typbon;
 
@@ -68,8 +87,9 @@ public class FactureDirecteDTO {
     private BigDecimal montantDevise;
     private String designationDevise;
     private String codeDevise;
-     private Integer codeCommandeAchat;
- private CommandeAchatDTO commandeAchat;
+    private Integer codeCommandeAchat;
+    private CommandeAchatDTO commandeAchat;
+
     public String getCodeDevise() {
         return codeDevise;
     }
@@ -77,15 +97,24 @@ public class FactureDirecteDTO {
     public void setCodeDevise(String codeDevise) {
         this.codeDevise = codeDevise;
     }
-    @JsonIgnore
-    private Date dateBonEdition;
+    //@JsonIgnore
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    private LocalDateTime dateBonEdition;
     @JsonIgnore
     private Date dateFournisseurEdition;
-    @JsonIgnore
-    private Date dateAnnuleEdition ;
+    //@JsonIgnore
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
+    private LocalDate dateAnnuleEdition;
+
+
+    private EnumCrudMethod action;
 
     @Valid
     private List<FactureDirecteCostCenterDTO> costCenters;
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime dateAnnule;
 
     @Size(min = 0, max = 50)
@@ -174,21 +203,29 @@ public class FactureDirecteDTO {
         this.datbon = datbon;
     }
 
-    public LocalDate getDatesys() {
-        return datesys;
+    public EnumCrudMethod getAction() {
+        return action;
     }
 
-    public void setDatesys(LocalDate datesys) {
-        this.datesys = datesys;
+    public void setAction(EnumCrudMethod action) {
+        this.action = action;
     }
 
-    public LocalTime getHeuresys() {
-        return heuresys;
-    }
-
-    public void setHeuresys(LocalTime heuresys) {
-        this.heuresys = heuresys;
-    }
+    //    public LocalDate getDatesys() {
+//        return datesys;
+//    }
+//
+//    public void setDatesys(LocalDate datesys) {
+//        this.datesys = datesys;
+//    }
+//
+//    public LocalTime getHeuresys() {
+//        return heuresys;
+//    }
+//
+//    public void setHeuresys(LocalTime heuresys) {
+//        this.heuresys = heuresys;
+//    }
 
     public TypeBonEnum getTypbon() {
         return typbon;
@@ -222,11 +259,11 @@ public class FactureDirecteDTO {
         this.fournisseur = fournisseur;
     }
 
-    public Date getDateBonEdition() {
+    public LocalDateTime getDateBonEdition() {
         return dateBonEdition;
     }
 
-    public void setDateBonEdition(Date dateBonEdition) {
+    public void setDateBonEdition(LocalDateTime dateBonEdition) {
         this.dateBonEdition = dateBonEdition;
     }
 
@@ -318,11 +355,11 @@ public class FactureDirecteDTO {
         this.devise = devise;
     }
 
-    public Date getDateAnnuleEdition() {
+    public LocalDate getDateAnnuleEdition() {
         return dateAnnuleEdition;
     }
 
-    public void setDateAnnuleEdition(Date dateAnnuleEdition) {
+    public void setDateAnnuleEdition(LocalDate dateAnnuleEdition) {
         this.dateAnnuleEdition = dateAnnuleEdition;
     }
 
@@ -342,11 +379,40 @@ public class FactureDirecteDTO {
         this.commandeAchat = commandeAchat;
     }
 
-   
-
-   
-
-
-    
-
+    @Override
+    public String toString() {
+        return "FactureDirecteDTO{" +
+                "codeFournisseur='" + codeFournisseur + '\'' +
+                ", designationFournisseur='" + designationFournisseur + '\'' +
+                ", dateFournisseur=" + dateFournisseur +
+                ", referenceFournisseur='" + referenceFournisseur + '\'' +
+                ", montant=" + montant +
+                ", baseTvaFactureDirecteCollection=" + baseTvaFactureDirecteCollection +
+                ", detailFactureDirecteCollection=" + detailFactureDirecteCollection +
+                ", numbon='" + numbon + '\'' +
+                ", codvend='" + codvend + '\'' +
+                ", datbon=" + datbon +
+                ", typbon=" + typbon +
+                ", numaffiche='" + numaffiche + '\'' +
+                ", observation='" + observation + '\'' +
+                ", categDepot=" + categDepot +
+                ", fournisseur=" + fournisseur +
+                ", integrer=" + integrer +
+                ", devise=" + devise +
+                ", tauxDevise=" + tauxDevise +
+                ", montantDevise=" + montantDevise +
+                ", designationDevise='" + designationDevise + '\'' +
+                ", codeDevise='" + codeDevise + '\'' +
+                ", codeCommandeAchat=" + codeCommandeAchat +
+                ", commandeAchat=" + commandeAchat +
+                ", dateBonEdition=" + dateBonEdition +
+                ", dateFournisseurEdition=" + dateFournisseurEdition +
+                ", dateAnnuleEdition=" + dateAnnuleEdition +
+                ", action=" + action +
+                ", costCenters=" + costCenters +
+                ", dateAnnule=" + dateAnnule +
+                ", userAnnule='" + userAnnule + '\'' +
+                ", modeReglementList=" + modeReglementList +
+                '}';
+    }
 }

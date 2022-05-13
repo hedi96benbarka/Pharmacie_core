@@ -15,13 +15,16 @@ import com.csys.pharmacie.achat.service.DemandeServiceClient;
 import com.csys.pharmacie.client.service.ParamAchatServiceClient;
 import static com.csys.pharmacie.helper.CategorieDepotEnum.EC;
 import com.csys.pharmacie.client.service.ParamServiceClient;
+import com.csys.pharmacie.config.SenderComptable;
 import com.csys.pharmacie.helper.DetailMvtSto;
 import com.csys.pharmacie.helper.Helper;
 import com.csys.pharmacie.helper.TypeBonEnum;
 import com.csys.pharmacie.helper.WhereClauseBuilder;
 import com.csys.pharmacie.inventaire.service.InventaireService;
 import com.csys.pharmacie.parametrage.repository.ParamService;
+import com.csys.pharmacie.prelevement.dto.DepartementDTO;
 import com.csys.pharmacie.stock.domain.Depsto;
+import com.csys.pharmacie.stock.repository.DepstoRepository;
 import com.csys.pharmacie.stock.service.StockService;
 import com.csys.pharmacie.transfert.domain.BaseTvaRedressement;
 
@@ -64,6 +67,7 @@ import static java.util.stream.Collectors.toSet;
 import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -91,7 +95,13 @@ public class FactureBEService {
     private final PricingService pricingService;
     private final DemandeServiceClient demandeServiceClient;
 
-    public FactureBEService(FactureBERepository facturebeRepository, ParamService paramService, StockService stockService, ParamAchatServiceClient paramAchatServiceClient, ParamServiceClient parametrageService, InventaireService inventaireService, PricingService pricingService, DemandeServiceClient demandeServiceClient) {
+    private final DepstoRepository depstoRepository;
+    private final SenderComptable senderComptable;
+
+    @Value("${kafka.topic.redressement-bill-management-for-accounting}")
+    private String topicRedressementBillManagementForAccounting;
+
+    public FactureBEService(FactureBERepository facturebeRepository, ParamService paramService, StockService stockService, ParamAchatServiceClient paramAchatServiceClient, ParamServiceClient parametrageService, InventaireService inventaireService, PricingService pricingService, DemandeServiceClient demandeServiceClient,SenderComptable senderComptable,DepstoRepository depstoRepository) {
         this.facturebeRepository = facturebeRepository;
         this.paramService = paramService;
         this.stockService = stockService;
@@ -101,6 +111,8 @@ public class FactureBEService {
         this.inventaireService = inventaireService;
         this.pricingService = pricingService;
         this.demandeServiceClient = demandeServiceClient;
+        this.senderComptable=senderComptable;
+        this.depstoRepository=depstoRepository;
     }
 
     /**
@@ -120,12 +132,23 @@ public class FactureBEService {
         String numbon = paramService.getcompteur(facturebeDTO.getCategDepot(), TypeBonEnum.BE);
         facturebe.setNumbon(numbon);
 
-        MotifDemandeRedressementDTO motifRedressement = paramAchatServiceClient.findMotifDemandeRedressementById(facturebeDTO.getCodeMotifRedressement());
-        Map<Boolean, List<MvtStoBEDTO>> partitioned = facturebeDTO.getDetails().stream().collect(partitioningBy(e -> e.getQuantite().compareTo(BigDecimal.ZERO) > 0));
 
-        // check inventory 
+
+        Set<Integer>  itemIds = facturebeDTO.getDetails().stream().map(MvtStoBEDTO::getCodArt).collect(Collectors.toSet());
+        List<ArticleDTO> listAllItems = (List<ArticleDTO>) paramAchatServiceClient.findArticlebyCategorieDepotAndListCodeArticle(facturebeDTO.getCategDepot(), itemIds.toArray(new Integer[itemIds.size()]));        //List<ArticleDTO> articles=paramAchatServiceClient.findArticlebyCategorieDepotAndCodeArticle(facturebe.getCategDepot(), detail.getCode())
+        log.debug("liste des articels {}",listAllItems);
+        // check inventory
+        Map<Boolean, List<MvtStoBEDTO>> partitioned = facturebeDTO.getDetails().stream().collect(partitioningBy(e -> e.getQuantite().compareTo(BigDecimal.ZERO) > 0));
+        Set<Integer> listItemsIdsWithQuantityGreaterThanZero=partitioned.get(true).stream().map(MvtStoBEDTO::getCodArt).collect(Collectors.toSet());
+
+
         Set<Integer> categArticleIDs = new HashSet();
-        List<ArticleDTO> articlesAveQteGreaterThanZero = (List<ArticleDTO>) paramAchatServiceClient.findArticlebyCategorieDepotAndListCodeArticle(facturebeDTO.getCategDepot(), partitioned.get(true).stream().map(MvtStoBEDTO::getCodArt).toArray(Integer[]::new));
+        //List<ArticleDTO> articlesAveQteGreaterThanZero = (List<ArticleDTO>) paramAchatServiceClient.findArticlebyCategorieDepotAndListCodeArticle(facturebeDTO.getCategDepot(), partitioned.get(true).stream().map(MvtStoBEDTO::getCodArt).toArray(Integer[]::new));
+        List<ArticleDTO> articlesAveQteGreaterThanZero =listAllItems
+                .stream()
+                .filter(article->listItemsIdsWithQuantityGreaterThanZero.contains(article.getCode()))
+                .collect(Collectors.toList());
+        log.debug("liste des articels positifs  {} ****",articlesAveQteGreaterThanZero);
         articlesAveQteGreaterThanZero.forEach(item -> {
             Preconditions.checkBusinessLogique(!Boolean.TRUE.equals(item.getAnnule()) && !(Boolean.TRUE.equals(item.getStopped())), "item.stopped", item.getCodeSaisi());
             categArticleIDs.add(item.getCategorieArticle().getCode());
@@ -139,11 +162,13 @@ public class FactureBEService {
 
         Set<Integer> codeArticles = facturebeDTO.getDetails().stream().map(MvtStoBEDTO::getCodArt).collect(Collectors.toSet());
         List<Depsto> depstos = stockService.findByCodartInAndCoddepAndQteGreaterThan(new ArrayList(codeArticles), facturebeDTO.getCoddep(), BigDecimal.ZERO);
-//        log.debug("depstos sont {}", depstos);
+       log.debug("depstos sont {}", depstos);
         List<MvtStoBE> listeMvtstoBE = new ArrayList();
         List<Depsto> newStock = new ArrayList();
         String numordre1 = "0001";
-///////////////////////traitement de la quantite negative////////////////////////////////////
+        MotifDemandeRedressementDTO motifRedressement = paramAchatServiceClient.findMotifDemandeRedressementById(facturebeDTO.getCodeMotifRedressement());
+
+        ///////////////////////traitement de la quantite negative////////////////////////////////////
         if (Boolean.TRUE.equals(motifRedressement.getCorrectionLot())) {
             log.debug("**********************debut traitement correction lot*************** ");
             Map<Pair<Integer, Integer>, List<MvtStoBEDTO>> listeMvtstoBEGroupedByItemAndUnit = facturebeDTO.getDetails().stream()
@@ -172,7 +197,7 @@ public class FactureBEService {
                     Helper.IncrementString(numordre1, 4);
 
                     List<Depsto> listeMatchingDepstos = depstos.stream()
-                            //                            .peek(x-> log.debug("lot inter du depsto est {} et lot du mvtsto est {} et equal est {}",x.getLotInter(),mvtStoBEToRemove.getLotinter(),x.getLotInter().equals(mvtStoBEToRemove.getLotinter())))
+                        .peek(x-> log.debug("lot inter du depsto est {} et lot du mvtsto est {} et equal est {}",x.getLotInter(),mvtStoBEToRemove.getLotinter(),x.getLotInter().equals(mvtStoBEToRemove.getLotinter())))
                             .filter(elt
                                     -> elt.getCodart().equals(mvtStoBEToRemove.getCodart())
                             && elt.getUnite().equals(mvtStoBEToRemove.getUnite())
@@ -273,9 +298,9 @@ public class FactureBEService {
 
                 }
 //                mvtStoBE.setPriuni(priuni.divide(mvtStoDTO.getQuantite().abs(), 2, RoundingMode.CEILING));
-//            if (articles.stream().filter(elt -> elt.getCode().equals(mvtStoBE.getCodart()) && elt.getCodeUnite().equals(elt.getCodeUnite())).findFirst().isPresent()) { 
+//            if (articles.stream().filter(elt -> elt.getCode().equals(mvtStoBE.getCodart()) && elt.getCodeUnite().equals(elt.getCodeUnite())).findFirst().isPresent()) {
 //                articlesToRecalculatePMP.add(mvtStoBE);
-//      
+//
             }
         }
         // log.debug("newStock sont {}", newStock);
@@ -311,68 +336,38 @@ public class FactureBEService {
         if (Boolean.TRUE.equals(motifRedressement.getRegenererPMP())) {
             pricingService.updatePricesAfterRedressement(facturebe, facturebeDTO.getCategDepot());
         }
-        DemandeRedressementDTO updatedDemande = demandeServiceClient.UpdateSatisfiedDemande(facturebeDTO.getNumeroDemande(), facturebe.getNumbon());
-        Preconditions.checkBusinessLogique(updatedDemande != null, "error-updating-demande");
+       /* DemandeRedressementDTO updatedDemande = demandeServiceClient.UpdateSatisfiedDemande(facturebeDTO.getNumeroDemande(), facturebe.getNumbon());
+        Preconditions.checkBusinessLogique(updatedDemande != null, "error-updating-demande");*/
+
         paramService.updateCompteurPharmacie(facturebeDTO.getCategDepot(), TypeBonEnum.BE);
         FactureBEDTO resultDTO = FactureBEFactory.facturebeToFactureBEDTO(facturebe, false);
+
+        //added by oumayma
+        DepartementDTO departementDTO = paramAchatServiceClient.findDepartment(facturebe.getCoddep());
+        log.info("CostCenter  : ",departementDTO.getCodeCostCenter());
+        resultDTO.setCostCenter(departementDTO.getCodeCostCenter());
+
+        //badelt ha4i false
+
+
+        List<MvtStoBEDTO> mvtstoBEDTOs=new ArrayList<>();
+        facturebe.getDetailFactureBECollection().stream().forEach(detail->{
+            MvtStoBEDTO mvtstoBEDTO= MvtStoBEFactory.mvtstobeToMvtStoBEDTO(detail);
+           ArticleDTO matchedItem=  listAllItems.stream().filter(article->article.getCode().equals(mvtstoBEDTO.getCodArt()))
+                   .findFirst()
+                     .orElseThrow(() -> new IllegalBusinessLogiqueException("missing-article", new Throwable(detail.getCodart().toString())));
+
+            mvtstoBEDTO.setCodeCategorie(matchedItem.getCategorieArticle().getCode());
+            log.debug("code categorie1 : "+matchedItem.getCategorieArticle().getCode());
+            log.debug("code categorie2 : "+mvtstoBEDTO.getCodeCategorie());
+            mvtstoBEDTOs.add(mvtstoBEDTO);
+             });
+                resultDTO.setDetails(mvtstoBEDTOs);
+
+        senderComptable.sendRedressementBill(topicRedressementBillManagementForAccounting, numbon, resultDTO);
         return resultDTO;
     }
 
-    //    public FactureBEDTO saveAfterValidationTransfert(FactureBEDTO facturebeDTO, String NumBonTransfert) {
-    //
-    //        log.debug("Request to save FactureBE: {}", facturebeDTO);
-    //
-    //        FactureBE facturebe = FactureBEFactory.facturebeDTOToFactureBE(facturebeDTO);
-    //        String numbon = paramService.getcompteur(facturebeDTO.getCategDepot(), TypeBonEnum.BE);
-    //        facturebe.setNumbon(numbon);
-    //        facturebe.setMotifRedressement(motifRedressementService.findMotifRedressement(facturebeDTO.getMotifRedressement().getId()));
-    //        List<MvtStoBE> detailsFactureBE = new ArrayList();
-    //
-    ////        List<Integer> codArticles = facturebeDTO.getDetails().stream().map(item -> item.getCodArt()).collect(toList());
-    ////
-    //        List<Depsto> depstos = stockService.findDepstoByNumBon(NumBonTransfert);
-    //
-    //        String numordre1 = "0001";
-    //        for (MvtStoBEDTO mvtstoBEDTO : facturebeDTO.getDetails()) {
-    //            MvtStoBE detailFacture = MvtStoBEFactory.mvtstobeDTOToMvtStoBE(mvtstoBEDTO);
-    //            detailFacture.setCodart(mvtstoBEDTO.getCodArt());
-    //            detailFacture.setNumbon(numbon);
-    //            detailFacture.setNumordre(numordre1);
-    //            detailFacture.setFactureBE(facturebe);
-    //            numordre1 = Helper.IncrementString(numordre1, 4);
-    //            detailsFactureBE.add(detailFacture);
-    //
-    //            List<Depsto> depstoToUpdate = depstos.stream()
-    //                    .filter(item -> item.getCodart().equals(detailFacture.getCodart()) && item.getDatPer().equals(detailFacture.getDatPer())
-    //                    && item.getLotInter().equals(detailFacture.getLotinter()) && item.getUnite().equals(detailFacture.getUnite())).collect(Collectors.toList());
-    //            log.debug("liste depstoToUpdate est {}", depstoToUpdate);
-    //            BigDecimal qteToSoustract = mvtstoBEDTO.getQuantite().negate();
-    //
-    //            if (!depstoToUpdate.isEmpty()) {
-    //
-    //                Iterator<Depsto> it = depstoToUpdate.iterator();
-    //                while (it.hasNext() && qteToSoustract.compareTo(BigDecimal.ZERO) > 0) {
-    //
-    //                    Depsto actualDepsto = it.next();
-    //                    log.debug("actualDepsto est {}", actualDepsto);
-    //                    BigDecimal qteToSoustractParDepsto = actualDepsto.getQte().min(qteToSoustract);
-    //                    actualDepsto.setQte(actualDepsto.getQte().subtract(qteToSoustractParDepsto));
-    //                    qteToSoustract = qteToSoustract.subtract(qteToSoustractParDepsto);
-    //                }
-    //            }
-    //        }
-    //        BigDecimal totaleMnt = detailsFactureBE.stream().map(item -> item.getPriuni().multiply(item.getQuantite())).reduce(BigDecimal.ZERO, (p, q) -> p.add(q));
-    //        facturebe.setMntbon(totaleMnt.abs());
-    //        facturebe.setDetailFactureBECollection(detailsFactureBE);
-    //
-    //        List<TvaDTO> listTvas = paramAchatServiceClient.findTvas();
-    //        facturebe.calcul(listTvas);
-    //        facturebe = facturebeRepository.save(facturebe);
-    //
-    //        paramService.updateCompteurPharmacie(facturebeDTO.getCategDepot(), TypeBonEnum.BE);
-    //        FactureBEDTO resultDTO = FactureBEFactory.facturebeToFactureBEDTO(facturebe);
-    //        return resultDTO;
-    //    }
     public FactureBEDTO update(FactureBEDTO facturebeDTO) {
         log.debug("Request to update FactureBE: {}", facturebeDTO);
         FactureBE inBase = facturebeRepository.findOne(facturebeDTO.getNumbon());
@@ -417,6 +412,11 @@ public class FactureBEService {
                     mvtstoBEDTO.setDatPer(item.getDatPer());
                     mvtstoBEDTO.setDesart(item.getMvtStoBE().getDesart());
                     mvtstoBEDTO.setDesArtSec(item.getMvtStoBE().getDesArtSec());
+                    //TODO all for dto produced to compta
+                   // Depsto depsto=depstoRepository.findOne(item.getDepsto().getCode()) ;
+                    //mvtstoBEDTO.setPriuni_depsto(depsto.getPu());
+
+                 //   log.debug(depsto.toString());
                     UniteDTO matchedUnit = unities.stream().filter(unit -> unit.getCode().equals(item.getUnite()))
                             .findFirst().orElseThrow(() -> new IllegalBusinessLogiqueException("missing-unit", new Throwable(item.getUnite().toString())));
                     mvtstoBEDTO.setDesignationUnite(matchedUnit.getDesignation());

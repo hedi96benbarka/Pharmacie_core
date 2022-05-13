@@ -17,6 +17,7 @@
     <class>com.csys.pharmacie.stock.domain.ConsommationReelleForRop</class>
     <class>com.csys.pharmacie.achat.domain.TransfertCompanyBranch</class>
     <class>com.csys.pharmacie.achat.domain.DetailTransfertCompanyBranch</class>
+    <class>com.csys.pharmacie.achat.domain.KafkaProducerErrorGec</class>
     <properties>
       <property name="javax.persistence.jdbc.url" value="jdbc:sqlserver://172.16.10.10\sql2014;databaseName=GcliniqueDev"/>
       <property name="javax.persistence.jdbc.user" value="sa"/>

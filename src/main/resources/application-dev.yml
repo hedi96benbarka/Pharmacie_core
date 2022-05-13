@@ -1,4 +1,4 @@
-management:
+liquimanagement:
     security:
         enabled: false
 security:
@@ -26,9 +26,9 @@ spring:
  
 #        url: jdbc:sqlserver://172.20.18.151\sql2014;database=GcliniqueEgyptePreProd
 #        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueEgypteCSH
-#        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueDev
+        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueDev
 #        url: jdbc:sqlserver://172.22.102.50\sql2014;database=GcliniqueEgypte
-        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueParam
+#        url: jdbc:sqlserver://172.16.10.10\sql2014;database=GcliniqueParam
 #        url: jdbc:sqlserver://172.20.102.20\sql2014;database=GcliniqueEgypte
 #        url: jdbc:sqlserver://172.21.102.20\sql2014;database=GcliniqueEgypte
 #        url: jdbc:sqlserver://172.23.102.20\sql2014;database=GcliniqueEgypte
@@ -93,7 +93,7 @@ logging:
          hibernate:
                type: DEBUG                
 paramAchatService :
-    base-uri : http://172.16.10.15/parametrage-achat-core
+    base-uri : http://172.16.10.45/parametrage-achat-core
 #    base-uri : http://172.16.10.15/parametrage-achat-core
 #    base-uri : http://localhost:9001/parametrage-achat-core
 #    base-uri : http://172.20.102.26/parametrage-achat-core
@@ -129,7 +129,7 @@ immobilisation :
    immobilisations : /api/immobilisations
    
 receptionService :
-    base-uri : http://172.16.10.15/reception-core
+    base-uri : http://172.16.10.45/reception-core
 #    base-uri : http://172.16.10.15/reception-core
 #    base-uri : http://197.14.53.85:8090/reception-core
     admission-facturations: /api/admission-facturations
@@ -151,7 +151,7 @@ demandeService :
     demanderedressement: /api/demande-redressement
     
 paramService :
-  base-uri : http://172.16.10.15/parametrage-core
+  base-uri : http://172.16.10.45/parametrage-core
 #  base-uri : http://172.16.10.15/parametrage-core
 #  base-uri : http://172.20.102.26/parametrage-core
 #  base-uri : http://172.22.102.26/parametrage-core
@@ -168,7 +168,7 @@ paramService :
   site: /api/sites
   
 caisseService :
-  base-uri : http://172.16.10.15/caisse-core
+  base-uri : http://172.16.10.45/caisse-core
   devises : /api/devises
  
 cliniSys :
@@ -220,7 +220,7 @@ time-of-cron-prepare-data-rop-immo: '00 00 04 * * *'
 time-of-cron-excuted-rop-immo: '00 30 04 * * *'
 
 server:
-    port: 9004
+    port: 9005
     contextPath: /pharmacie-core
     
 proxy:
@@ -239,6 +239,11 @@ kafka:
       transfer-company-to-branch-management: transfer-company-to-branch-management
       transfer-branch-to-company-management: transfer-branch-to-company-management
       direct-bill-management-for-accounting: direct-bill-management-for-accounting
+      redressement-bill-management-for-accounting: redressement-bill-management-for-accounting
+
+
+
+
     servers:
         bootstrap: 172.16.10.30:9092,172.16.10.31:9092,172.16.10.32:9092 
     group_id: pharmacie-core_local   
@@ -249,7 +254,8 @@ context:
     reception: 
     transfert-with-quittance: 
     
-mailFrom: soft@csys.com.tn    
+mailFrom: soft@csys.com.tn  
+mails-recipient-producer-Gec-failure: benbarkahedig4@gmail.com
 environnement: local   
 code-site: 9
 code-company-for-branch: 1

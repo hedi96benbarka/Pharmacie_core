@@ -70,6 +70,7 @@ public class BonRedressementController {
         }
 
         FactureBEDTO result = factureBEService.save(dto);
+
         return ResponseEntity.created(new URI("/api/transfert-recup/" + result.getNumbon())).body(result);
     }
 

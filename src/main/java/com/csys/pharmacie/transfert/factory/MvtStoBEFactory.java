@@ -11,6 +11,7 @@ import com.csys.pharmacie.transfert.domain.MvtStoBE;
 import com.csys.pharmacie.transfert.dto.MvtStoBEDTO;
 import com.csys.pharmacie.transfert.dto.MvtStoBEEditionDTO;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -25,17 +27,20 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MvtStoBEFactory {
-    
+
     static String LANGUAGE_SEC;
-    
+
     @Value("${lang.secondary}")
     public void setLanguage(String db) {
         LANGUAGE_SEC = db;
     }
+
+
     @Autowired
     MessageSource messages;
     
     public static MvtStoBEDTO mvtstobeToMvtStoBEDTO(MvtStoBE mvtstobe) {
+        BigDecimal sum=BigDecimal.ZERO;
         MvtStoBEDTO mvtstobeDTO = new MvtStoBEDTO();
         mvtstobeDTO.setCodArt(mvtstobe.getCodart());
         mvtstobeDTO.setNumBon(mvtstobe.getNumbon());
@@ -45,22 +50,85 @@ public class MvtStoBEFactory {
         mvtstobeDTO.setCategDepot(mvtstobe.getCategDepot());
         mvtstobeDTO.setCodtva(mvtstobe.getCodtva());
         mvtstobeDTO.setTautva(mvtstobe.getTautva());
-        
+
         if (LocaleContextHolder.getLocale().getLanguage().equals(new Locale(LANGUAGE_SEC).getLanguage())) {
             mvtstobeDTO.setDesart(mvtstobe.getDesArtSec());
             mvtstobeDTO.setDesArtSec(mvtstobe.getDesart());
-            
+
         } else {
             mvtstobeDTO.setDesart(mvtstobe.getDesart());
             mvtstobeDTO.setDesArtSec(mvtstobe.getDesArtSec());
-            
+
         }
-        
+
         mvtstobeDTO.setDesart(mvtstobe.getDesart());
         mvtstobeDTO.setDesArtSec(mvtstobe.getDesArtSec());
         mvtstobeDTO.setCodeSaisi(mvtstobe.getCodeSaisi());
         mvtstobeDTO.setQuantite(mvtstobe.getQuantite());
         mvtstobeDTO.setCodeUnite(mvtstobe.getUnite());
+        //mvtstobe.getDetailMvtStoBEList().stream().forEach(System.out::println);
+//        mvtstobe.getDetailMvtStoBEList().stream().forEach(detail->{
+           // s=s.add(detail.getPriuni().multiply(detail.getTauxTva()));
+            //to test
+        if(mvtstobe.getQuantite().compareTo(BigDecimal.ZERO)<0){
+            for(DetailMvtStoBE detail:mvtstobe.getDetailMvtStoBEList()){
+                if(detail.getTauxTva().compareTo(BigDecimal.ZERO)>0){
+                    sum=sum.add(detail.getPriuni().multiply(detail.getQuantitePrelevee()).multiply(BigDecimal.valueOf(1).add(detail.getTauxTva().divide(BigDecimal.valueOf(100)))));
+                }
+                else{
+                    sum=sum.add(detail.getPriuni().multiply(detail.getQuantitePrelevee()));
+                }
+
+
+            }
+            System.out.println("somme=" + sum);
+
+//            sum = mvtstobe.getDetailMvtStoBEList().stream().filter(x->x.getTauxTva().compareTo(BigDecimal.ZERO)>0)
+//                    .map(x ->x.getPriuni().multiply(x.getQuantitePrelevee()).multiply(BigDecimal.valueOf(1).add(x.getTauxTva().divide(BigDecimal.valueOf(100)))))    // map
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add);      // reduce
+
+            //to test
+            // BigDecimal sum = invoices.stream()
+            //                .map(x -> x.getQty().multiply(x.getPrice()))    // map
+            //                .reduce(BigDecimal.ZERO, BigDecimal::add);      // reduce
+            //System.out.println("somme=" + sum);
+            mvtstobeDTO.setPrixMoyenTtc(sum.divide(mvtstobeDTO.getQuantite()).multiply(BigDecimal.valueOf(-1)));
+            System.out.println(mvtstobeDTO.getPrixMoyenTtc());
+
+        }
+        if(mvtstobe.getQuantite().compareTo(BigDecimal.ZERO)>0){
+
+                if(mvtstobe.getTautva().compareTo(BigDecimal.ZERO)>0){
+                    mvtstobeDTO.setPrixMoyenTtc(mvtstobe.getPriuni().multiply(mvtstobe.getQuantite()).multiply(BigDecimal.valueOf(1).add(mvtstobe.getTautva().divide(BigDecimal.valueOf(100)))));
+                }
+                else{
+                    mvtstobeDTO.setPrixMoyenTtc(mvtstobe.getPriuni().multiply(mvtstobe.getQuantite()));
+                }
+
+            System.out.println("montant pos"+mvtstobeDTO.getPrixMoyenTtc());
+            }
+
+
+//            sum = mvtstobe.getDetailMvtStoBEList().stream().filter(x->x.getTauxTva().compareTo(BigDecimal.ZERO)>0)
+//                    .map(x ->x.getPriuni().multiply(x.getQuantitePrelevee()).multiply(BigDecimal.valueOf(1).add(x.getTauxTva().divide(BigDecimal.valueOf(100)))))    // map
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add);      // reduce
+
+            //to test
+            // BigDecimal sum = invoices.stream()
+            //                .map(x -> x.getQty().multiply(x.getPrice()))    // map
+            //                .reduce(BigDecimal.ZERO, BigDecimal::add);      // reduce
+            //System.out.println("somme=" + sum);
+
+
+
+
+
+      /* if(mvtstobeDTO.getQuantite().compareTo(BigDecimal.ZERO) < 0) {
+           //selen slayma all detailmvsto on le meme prix a verifier avec sirine
+           mvtstobeDTO.setPriuni_depsto(mvtstobe.getDetailMvtStoBEList().get(0).getPriuni());
+       }else {
+           mvtstobeDTO.setPriuni_depsto(mvtstobe.getPriuni());
+       }*/
         return mvtstobeDTO;
     }
     
@@ -112,6 +180,7 @@ public class MvtStoBEFactory {
     public static List<MvtStoBEDTO> mvtstobeToMvtStoBEDTOs(List<MvtStoBE> mvtstobes) {
         List<MvtStoBEDTO> mvtstobesDTO = new ArrayList<>();
         mvtstobes.forEach(x -> {
+            System.out.println("affichage  "+ x);
             mvtstobesDTO.add(mvtstobeToMvtStoBEDTO(x));
         });
         return mvtstobesDTO;

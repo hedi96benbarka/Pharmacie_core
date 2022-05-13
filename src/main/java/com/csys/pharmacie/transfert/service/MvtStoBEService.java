@@ -9,6 +9,7 @@ import com.csys.pharmacie.helper.Mouvement;
 import com.csys.pharmacie.helper.TotalMouvement;
 import com.csys.pharmacie.helper.TypeDateEnum;
 import com.csys.pharmacie.helper.WhereClauseBuilder;
+import com.csys.pharmacie.transfert.domain.DetailMvtStoBE;
 import com.csys.pharmacie.transfert.domain.MvtStoBE;
 import com.csys.pharmacie.transfert.domain.MvtStoBEPK;
 import com.csys.pharmacie.transfert.domain.QMvtStoBE;
@@ -255,7 +256,15 @@ public class MvtStoBEService {
             }
         }
     }
-    
+
+    public  BigDecimal calculSommePrixTtc(List<DetailMvtStoBE> detailMvtStoBEList){
+        BigDecimal s=BigDecimal.valueOf(0);
+        detailMvtStoBEList.stream().forEach(detail->{
+            s.add(detail.getPriuni().multiply(detail.getTauxTva()));
+        });
+        return  s;
+    }
+
     
     public List<MvtStoBE> findByCodeArticleInAndDatBonAfterAndQuantityGreaterThan(Set<Integer> codeArticles, LocalDateTime datbon,BigDecimal quantite){
       log.debug("find derniers MVtstoBe avec les codarts suivants {}", codeArticles);

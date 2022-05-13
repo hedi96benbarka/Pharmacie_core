@@ -47,9 +47,9 @@ public class StartUpCommands {
         if (Arrays.stream(event.getApplicationContext().getEnvironment().getActiveProfiles()).anyMatch("kafka"::equals)//consumer start only if profile klafka and we are on context branch (to prevent producing and cosnuming on central)
                 && contextReception.contains("company")) {
     log.info("*****************context company ********** srarting consumer  equals to transfert-bon-reception-onShelf-management");
-            nativeConsumers.stream().filter(elt-> listTopicToConsumeInCompany.contains(elt.getTopic()))
-                    .forEach(AbstractNativeConsumer::start); 
-         }
+            nativeConsumers.stream().filter(elt-> !( listTopicToConsumeInCompany.contains(elt.getTopic())  ))
+                    .forEach(AbstractNativeConsumer::start);
+        }
         
      
     }

@@ -17,4 +17,5 @@ and open the template in the editor.
     <include file="db/changelog-1.0.0.xml"/>
     <include file="db/changelog-2.0.0.xml"/>
     <include file="db/company-branch.xml"/>
+    <include file="db/changelog-gec.xml"/>
 </databaseChangeLog>

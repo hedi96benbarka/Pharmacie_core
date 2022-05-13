@@ -361,6 +361,7 @@ public class ParamAchatServiceClient {
     }
 
     public List<ArticleIMMODTO> articleIMMOFindbyListCodeFallback(Collection<Integer> ids) {
+
         log.error("falling back from articleIMMOFindbyListCode");
         List<ArticleIMMODTO> listArt = new ArrayList<>();
         return listArt;

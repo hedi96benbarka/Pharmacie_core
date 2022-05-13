@@ -20,9 +20,8 @@ import com.csys.pharmacie.achat.factory.BaseTvaFactureDirecteFactory;
 import com.csys.pharmacie.achat.factory.DetailFactureDirecteFactory;
 import com.csys.pharmacie.achat.factory.FactureDirecteFactory;
 import com.csys.pharmacie.achat.repository.FactureDirecteRepository;
-import com.csys.pharmacie.helper.CategorieDepotEnum;
-import com.csys.pharmacie.helper.TypeBonEnum;
-import com.csys.pharmacie.helper.WhereClauseBuilder;
+import com.csys.pharmacie.config.SenderComptable;
+import com.csys.pharmacie.helper.*;
 import com.csys.pharmacie.parametrage.repository.ParamService;
 import com.csys.util.Preconditions;
 import java.io.IOException;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,9 +59,7 @@ import com.csys.pharmacie.client.dto.DeviseDTO;
 import com.csys.pharmacie.client.dto.ModeReglementDTO;
 import com.csys.pharmacie.client.dto.MotifPaiementDTO;
 import com.csys.pharmacie.client.service.CaisseServiceClient;
-import com.csys.pharmacie.helper.Convert;
-import com.csys.pharmacie.helper.Helper;
-import com.csys.pharmacie.helper.PurchaseOrderReceptionState;
+
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -91,8 +89,11 @@ public class FactureDirecteService {
     private final CaisseServiceClient caisseServiceClient;
     private final DemandeServiceClient demandeServiceClient;
     private final EtatReceptionCAService etatReceptionCAService;
+    private final SenderComptable senderComptable;
+    @Value("${kafka.topic.direct-bill-management-for-accounting}")
+    private String topicDirectBillManagementForAccounting;
 
-    public FactureDirecteService(FactureDirecteRepository facturedirecteRepository, ParamAchatServiceClient paramAchatServiceClient, ParamService paramService, DetailFactureDirecteService detailFactureDirecteService, FcptFrsPHService fcptFrsPHService, FcptFrsPHRepository fcptFrsPHRepository, ParamServiceClient parametrageService, CaisseServiceClient caisseServiceClient, DemandeServiceClient demandeServiceClient, EtatReceptionCAService etatReceptionCAService) {
+    public FactureDirecteService(FactureDirecteRepository facturedirecteRepository, ParamAchatServiceClient paramAchatServiceClient, ParamService paramService, DetailFactureDirecteService detailFactureDirecteService, FcptFrsPHService fcptFrsPHService, FcptFrsPHRepository fcptFrsPHRepository, ParamServiceClient parametrageService, CaisseServiceClient caisseServiceClient, DemandeServiceClient demandeServiceClient, EtatReceptionCAService etatReceptionCAService, SenderComptable senderComptable) {
         this.facturedirecteRepository = facturedirecteRepository;
         this.paramAchatServiceClient = paramAchatServiceClient;
         this.paramService = paramService;
@@ -103,6 +104,7 @@ public class FactureDirecteService {
         this.caisseServiceClient = caisseServiceClient;
         this.demandeServiceClient = demandeServiceClient;
         this.etatReceptionCAService = etatReceptionCAService;
+        this.senderComptable=senderComptable;
     }
 
     /**
@@ -115,7 +117,7 @@ public class FactureDirecteService {
         log.debug("Request to save FactureDirecte: {}", facturedirecteDTO);
 
         FactureDirecte facturedirecte = FactureDirecteFactory.facturedirecteDTOToFactureDirecte(facturedirecteDTO);
-        log.debug("datBon est :{}", facturedirecte.getDatbon());
+
         FactureDirecte factureWithSameRef = facturedirecteRepository.findByReferenceFournisseur(facturedirecte.getReferenceFournisseur());
         Preconditions.checkBusinessLogique(factureWithSameRef == null, "reffrs-fournisseur-exists");
 
@@ -137,9 +139,7 @@ public class FactureDirecteService {
             Preconditions.checkBusinessLogique(!Boolean.TRUE.equals(item.getAnnule()) && !(Boolean.TRUE.equals(item.getStopped())), "item.stopped", item.getCodeSaisi());
             Preconditions.checkBusinessLogique(!Boolean.TRUE.equals(item.getStockable()), "facture-directe.non-stockable-item", item.getCodeSaisi());
         });
-//        articles.stream().filter(ArticleDTO::getStockable).findFirst().ifPresent(item -> {
-//            throw new IllegalBusinessLogiqueException("facture-directe.non-stockable-item", new Throwable(item.getCodeSaisi()));
-//        });
+
         String numbon = paramService.getcompteur(facturedirecteDTO.getCategDepot(), TypeBonEnum.DIR);
         facturedirecte.setIntegrer(false);
         facturedirecte.setNumbon(numbon);
@@ -152,7 +152,8 @@ public class FactureDirecteService {
         fcptFrsPHService.addFcptFrsOnFactureDirecte(facturedirecte);
         paramService.updateCompteurPharmacie(CategorieDepotEnum.EC, TypeBonEnum.DIR);
         FactureDirecteDTO resultDTO = FactureDirecteFactory.facturedirecteToFactureDirecteDTO(facturedirecte, Boolean.FALSE);
-
+        resultDTO.setAction(EnumCrudMethod.CREATE);
+        senderComptable.sendDirectBill(topicDirectBillManagementForAccounting, numbon, resultDTO);
         return resultDTO;
     }
     
@@ -209,7 +210,8 @@ public class FactureDirecteService {
         fcptFrsPHService.addFcptFrsOnFactureDirecte(facturedirecte);
         paramService.updateCompteurPharmacie(CategorieDepotEnum.EC, TypeBonEnum.DIR);
         FactureDirecteDTO resultDTO = FactureDirecteFactory.facturedirecteToFactureDirecteDTO(facturedirecte, Boolean.FALSE);
-
+        resultDTO.setAction(EnumCrudMethod.CREATE);
+        senderComptable.sendDirectBill(topicDirectBillManagementForAccounting, numbon, resultDTO);
         return resultDTO;
     }
 
@@ -278,6 +280,8 @@ public class FactureDirecteService {
 
         fcptFrsPHService.updateFcptFrsOnFactureDirecte(fcptFrs, facturedirecte);
         FactureDirecteDTO resultDTO = FactureDirecteFactory.facturedirecteToFactureDirecteDTO(facturedirecte, Boolean.FALSE);
+        resultDTO.setAction(EnumCrudMethod.UPDATE);
+        senderComptable.sendDirectBill(topicDirectBillManagementForAccounting, factureDirecteDTO.getNumbon(), resultDTO);
         return resultDTO;
     }
 
@@ -447,6 +451,9 @@ public class FactureDirecteService {
         facturedirecte.setDateAnnule(date);
         facturedirecte.setUserAnnule(SecurityContextHolder.getContext().getAuthentication().getName());
         fcptFrsPHService.deleteFcptfrsByNumBonDao(id, facturedirecte.getTypbon());
+        FactureDirecteDTO resultDTO = FactureDirecteFactory.facturedirecteToFactureDirecteDTO(facturedirecte, Boolean.FALSE);
+        resultDTO.setAction(EnumCrudMethod.CANCEL);
+        senderComptable.sendDirectBill(topicDirectBillManagementForAccounting, facturedirecte.getNumbon(), resultDTO);
         facturedirecteRepository.save(facturedirecte);
     }
 

@@ -48,6 +48,10 @@ public class FactureBADTO extends BaseBonDTO<MvtstoBADTO> {
 
     private Integer maxDelaiPaiement;
 
+
+
+
+
     @Valid
     @NotNull
     private List<BaseTvaReceptionDTO> basesTVA;

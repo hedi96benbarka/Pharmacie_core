@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,7 @@ public class KafkaConfigurationConsumer {
     @Value("${kafka.group_id}") 
     private String groupId;// ="pharmacie-core";";
 
+    
     public Map<String, Object> getConsumerConfig() {
         consumerConfig = new HashMap<>();
         consumerConfig.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
@@ -39,7 +41,7 @@ public class KafkaConfigurationConsumer {
         consumerConfig.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, 20000);
         consumerConfig.put(ConsumerConfig.FETCH_MIN_BYTES_CONFIG, 1_000_000_000);
         consumerConfig.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);
-        return consumerConfig;
+       return consumerConfig;
     }
     
 }

@@ -134,9 +134,22 @@ public class MvtStoBE extends MvtSto implements Serializable {
         this.quantitePrecedante = quantitePrecedante;
     }
 
-    @Override
-    public String toString() {
-        return "MvtStoBE{" + "detailMvtStoBEList=" + detailMvtStoBEList + ", numordre=" + numordre + ", codtva=" + codtva + ", tautva=" + tautva + ", pmpPrecedent=" + pmpPrecedent + ", quantitePrecedante=" + quantitePrecedante + ", factureBE=" + factureBE + '}';
-    }
+//    @Override
+//    public String toString() {
+//        return "MvtStoBE{" +
+//                "detailMvtStoBEList=" + detailMvtStoBEList +
+//                ", numordre='" + numordre + '\'' +
+//                ", codtva=" + codtva +
+//                ", tautva=" + tautva +
+//                ", pmpPrecedent=" + pmpPrecedent +
+//                ", quantitePrecedante=" + quantitePrecedante +
+//                ", factureBE=" + factureBE +
+//                '}';
+//    }
+
+    //    @Override
+//    public String toString() {
+//        return "MvtStoBE{" + "detailMvtStoBEList=" + detailMvtStoBEList + ", numordre=" + numordre + ", codtva=" + codtva + ", tautva=" + tautva + ", pmpPrecedent=" + pmpPrecedent + ", quantitePrecedante=" + quantitePrecedante + ", factureBE=" + factureBE + '}';
+//    }
  
 }

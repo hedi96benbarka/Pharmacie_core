@@ -13,7 +13,8 @@ public enum EnumCrudMethod {
     CREATE("CREATE"),
     READ("READ"),
     UPDATE("UPDATE"),
-    DELETE("DELETE");
+    DELETE("DELETE"),
+    CANCEL("CANCEL");
 
     private final String crudMethod;
 

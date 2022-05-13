@@ -47,8 +47,8 @@ public class FactureDirecteFactory {
         facturedirecteDTO.setNumbon(facturedirecte.getNumbon());
         facturedirecteDTO.setCodvend(facturedirecte.getCodvend());
         facturedirecteDTO.setDatbon(facturedirecte.getDatbon());
-        facturedirecteDTO.setDatesys(facturedirecte.getDatesys());
-        facturedirecteDTO.setHeuresys(facturedirecte.getHeuresys());
+//        facturedirecteDTO.setDatesys(facturedirecte.getDatesys());
+  //      facturedirecteDTO.setHeuresys(facturedirecte.getHeuresys());
         facturedirecteDTO.setTypbon(facturedirecte.getTypbon());
         facturedirecteDTO.setNumaffiche(facturedirecte.getNumaffiche());
         facturedirecteDTO.setCategDepot(facturedirecte.getCategDepot());
@@ -59,10 +59,10 @@ public class FactureDirecteFactory {
         facturedirecteDTO.setCodeDevise(facturedirecte.getCodeDevise());
         facturedirecteDTO.setTauxDevise(facturedirecte.getTauxDevise());
         facturedirecteDTO.setMontantDevise(facturedirecte.getMontantDevise());
-        facturedirecteDTO.setDateBonEdition(java.util.Date.from(facturedirecte.getDatbon().atZone(ZoneId.systemDefault())
-                .toInstant()));
+        facturedirecteDTO.setDateBonEdition(facturedirecte.getDatbon());
+
         if (facturedirecte.getDateAnnule() != null) {
-            facturedirecteDTO.setDateAnnuleEdition(java.util.Date.from(facturedirecte.getDateAnnule().atZone(ZoneId.systemDefault())
+            facturedirecteDTO.setDateAnnuleEdition(java.time.LocalDate.from(facturedirecte.getDateAnnule().atZone(ZoneId.systemDefault())
                     .toInstant()));
         }
         Instant instant = facturedirecte.getDateFournisseur().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();
@@ -102,8 +102,8 @@ public class FactureDirecteFactory {
         facturedirecte.setCostCenters(costCenters);
         facturedirecte.setCodvend(facturedirecteDTO.getCodvend());
         facturedirecte.setDatbon(facturedirecteDTO.getDatbon());
-        facturedirecte.setDatesys(facturedirecteDTO.getDatesys());
-        facturedirecte.setHeuresys(facturedirecteDTO.getHeuresys());
+      //  facturedirecte.setDatesys(facturedirecteDTO.getDatesys());
+        //facturedirecte.setHeuresys(facturedirecteDTO.getHeuresys());
         facturedirecte.setTypbon(facturedirecteDTO.getTypbon());
         facturedirecte.setNumaffiche(facturedirecteDTO.getNumaffiche());
         facturedirecte.setCategDepot(facturedirecteDTO.getCategDepot());
@@ -146,8 +146,8 @@ public class FactureDirecteFactory {
         facturedirecteDTO.setNumbon(facturedirecte.getNumbon());
         facturedirecteDTO.setCodvend(facturedirecte.getCodvend());
         facturedirecteDTO.setDatbon(facturedirecte.getDatbon());
-        facturedirecteDTO.setDatesys(facturedirecte.getDatesys());
-        facturedirecteDTO.setHeuresys(facturedirecte.getHeuresys());
+       // facturedirecteDTO.setDatesys(facturedirecte.getDatesys());
+        //facturedirecteDTO.setHeuresys(facturedirecte.getHeuresys());
         facturedirecteDTO.setUserAnnule(facturedirecte.getUserAnnule());
         facturedirecteDTO.setDateAnnule(facturedirecte.getDateAnnule());
         facturedirecteDTO.setTypbon(facturedirecte.getTypbon());
@@ -159,10 +159,10 @@ public class FactureDirecteFactory {
         facturedirecteDTO.setTauxDevise(facturedirecte.getTauxDevise());
         facturedirecteDTO.setMontantDevise(facturedirecte.getMontantDevise());
         facturedirecteDTO.setCodeCommandeAchat(facturedirecte.getCodeCommandeAchat());
-        facturedirecteDTO.setDateBonEdition(java.util.Date.from(facturedirecte.getDatbon().atZone(ZoneId.systemDefault())
+        facturedirecteDTO.setDateBonEdition(java.time.LocalDateTime.from(facturedirecte.getDatbon().atZone(ZoneId.systemDefault())
                 .toInstant()));
         if (facturedirecte.getDateAnnule() != null) {
-            facturedirecteDTO.setDateAnnuleEdition(java.util.Date.from(facturedirecte.getDateAnnule().atZone(ZoneId.systemDefault())
+            facturedirecteDTO.setDateAnnuleEdition(java.time.LocalDate.from(facturedirecte.getDateAnnule().atZone(ZoneId.systemDefault())
                     .toInstant()));
         }
             Instant instant = facturedirecte.getDateFournisseur().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant();

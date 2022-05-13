@@ -14,7 +14,7 @@ import org.springframework.data.domain.Pageable;
  *
  * @author DELL
  */
-public interface DepstoRepositoryCustom {
+public interface DepstoRepositoryCustom  {
 
     /**
      * @param prdct

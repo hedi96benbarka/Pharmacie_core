@@ -3,6 +3,13 @@ package com.csys.pharmacie.transfert.dto;
 import com.csys.pharmacie.helper.BaseTVADTO;
 import com.csys.pharmacie.helper.CategorieDepotEnum;
 import com.csys.pharmacie.helper.TypeBonEnum;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -38,6 +45,9 @@ public class FactureBEDTO {
     @Size(min = 0, max = 20)
     private String codvend;
 
+    //@NotNull
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     private LocalDateTime datbon;
 
     private TypeBonEnum typbon;
@@ -51,6 +61,7 @@ public class FactureBEDTO {
     
     private Integer numeroDemande;
     private Date datbonEdition;
+    private Integer costCenter;
 
     public FactureBEDTO(Integer coddep, Integer codeMotifRedressement, List<MvtStoBEDTO> details, CategorieDepotEnum categDepot) {
         this.coddep = coddep;
@@ -61,9 +72,14 @@ public class FactureBEDTO {
 
     public FactureBEDTO() {
     }
-    
-    
-    
+
+    public Integer getCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(Integer costCenter) {
+        this.costCenter = costCenter;
+    }
 
     public BigDecimal getMntbon() {
         return mntbon;

@@ -6,6 +6,8 @@
 package com.csys.pharmacie.transfert.repository;
 
 import java.util.Date;
+
+import com.csys.pharmacie.transfert.domain.DetailMvtStoBE;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -27,6 +29,7 @@ public interface FactureBERepository extends JpaRepository<FactureBE, String>, Q
 //    List< FactureBEProjection> findByDatbonBetweenOrderByDatbonDescNumafficheDesc(Date deb, Date fin);
 
     FactureBE findByNumbon(String numbon);
+
 
    @Deprecated 
     @Query(value = "SELECT new com.csys.pharmacie.helper.MouvementDuJour(COUNT(f.numbon),coalesce(SUM(f.mntbon),0)) FROM FactureBE f  WHERE f.datesys=?1 ")

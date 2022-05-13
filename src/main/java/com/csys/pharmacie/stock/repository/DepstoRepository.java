@@ -34,6 +34,7 @@ public interface DepstoRepository extends JpaRepository<Depsto, Integer>, QueryD
 
     List<Depsto> findByQteGreaterThan(BigDecimal qte);
 
+
     Boolean existsByCodartAndAInventorierTrueAndAndStkrelGreaterThan(Integer codart, BigDecimal stkrel);
 
     @Override

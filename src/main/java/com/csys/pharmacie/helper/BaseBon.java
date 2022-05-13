@@ -8,6 +8,7 @@ package com.csys.pharmacie.helper;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.EnumType;
@@ -129,4 +130,17 @@ public class BaseBon {
         this.numaffiche = numaffiche;
     }
 
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BaseBon baseBon = (BaseBon) o;
+        return numbon.equals(baseBon.numbon) && Objects.equals(codvend, baseBon.codvend) && Objects.equals(datbon, baseBon.datbon) && Objects.equals(datesys, baseBon.datesys) && Objects.equals(heuresys, baseBon.heuresys) && typbon == baseBon.typbon && Objects.equals(numaffiche, baseBon.numaffiche) && categDepot == baseBon.categDepot;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(numbon, codvend, datbon, datesys, heuresys, typbon, numaffiche, categDepot);
+    }
+}

@@ -1,6 +1,11 @@
 package com.csys.pharmacie.transfert.dto;
 
 import com.csys.pharmacie.helper.CategorieDepotEnum;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer;
+
 import java.lang.String;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -22,6 +27,23 @@ public class MvtStoBEDTO {
     //prixAchat article selon unite
     private BigDecimal priuni;
 
+
+
+    private BigDecimal prixMoyenTtc ;
+
+    private Integer codeCategorie;
+
+
+    public BigDecimal getPrixMoyenTtc() {
+        return prixMoyenTtc;
+    }
+
+    public void setPrixMoyenTtc(BigDecimal prixMoyenTtc) {
+        this.prixMoyenTtc = prixMoyenTtc;
+    }
+
+    @JsonSerialize(using = LocalDateSerializer.class)
+    @JsonDeserialize(using = LocalDateDeserializer.class)
     private LocalDate datPer;
 
     private String numBon;
@@ -63,6 +85,15 @@ public class MvtStoBEDTO {
     }
 
     public MvtStoBEDTO() {
+    }
+
+
+    public Integer getCodeCategorie() {
+        return codeCategorie;
+    }
+
+    public void setCodeCategorie(Integer codeCategorie) {
+        this.codeCategorie = codeCategorie;
     }
 
     public BigDecimal getTautva() {
@@ -186,9 +217,28 @@ public class MvtStoBEDTO {
     }
 
 
+
+
+
+
     @Override
     public String toString() {
-        return "MvtStoBEDTO{" + "codArt=" + codArt + ", numOrdre=" + numOrdre + ", lotInter=" + lotInter + ", priuni=" + priuni + ", datPer=" + datPer + ", numBon=" + numBon + ", categDepot=" + categDepot + ", desart=" + desart + ", desArtSec=" + desArtSec + ", codeSaisi=" + codeSaisi + ", quantite=" + quantite + ", codeUnite=" + codeUnite + ", designationUnite=" + designationUnite + ", tautva=" + tautva + ", codtva=" + codtva + '}';
+        return "MvtStoBEDTO{" +
+                "codArt=" + codArt +
+                ", numOrdre='" + numOrdre + '\'' +
+                ", lotInter='" + lotInter + '\'' +
+                ", priuni=" + priuni +
+                ", datPer=" + datPer +
+                ", numBon='" + numBon + '\'' +
+                ", categDepot=" + categDepot +
+                ", desart='" + desart + '\'' +
+                ", desArtSec='" + desArtSec + '\'' +
+                ", codeSaisi='" + codeSaisi + '\'' +
+                ", quantite=" + quantite +
+                ", codeUnite=" + codeUnite +
+                ", designationUnite='" + designationUnite + '\'' +
+                ", tautva=" + tautva +
+                ", codtva=" + codtva +
+                '}';
     }
-
 }

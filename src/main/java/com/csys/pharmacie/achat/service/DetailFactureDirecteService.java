@@ -34,6 +34,8 @@ public class DetailFactureDirecteService {
      * @param detailfacturedirecteDTO
      * @return the persisted entity
      */
+
+    @Transactional
     public DetailFactureDirecteDTO save(DetailFactureDirecteDTO detailfacturedirecteDTO) {
         log.debug("Request to save DetailFactureDirecte: {}", detailfacturedirecteDTO);
         DetailFactureDirecte detailfacturedirecte = DetailFactureDirecteFactory.detailfacturedirecteDTOToDetailFactureDirecte(detailfacturedirecteDTO);
@@ -48,6 +50,8 @@ public class DetailFactureDirecteService {
      * @param detailfacturedirecteDTO
      * @return the updated entity
      */
+
+    @Transactional
     public DetailFactureDirecteDTO update(DetailFactureDirecteDTO detailfacturedirecteDTO) {
         log.debug("Request to update DetailFactureDirecte: {}", detailfacturedirecteDTO);
         DetailFactureDirecte inBase = detailfacturedirecteRepository.findOne(detailfacturedirecteDTO.getCode());
@@ -112,13 +116,15 @@ public class DetailFactureDirecteService {
      *
      * @param id the id of the entity
      */
+
+    @Transactional
     public void delete(Integer id) {
         log.debug("Request to delete DetailFactureDirecte: {}", id);
         detailfacturedirecteRepository.delete(id);
     }
     
     
-    
+    @Transactional
     public void deleteList (List<Integer> codes)
     { log.debug("Request to delete liste detailFactureDirecte: {}", codes);
     detailfacturedirecteRepository.deleteByCodeIn(codes);

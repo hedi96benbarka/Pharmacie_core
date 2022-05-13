@@ -1,11 +1,5 @@
 package com.csys.pharmacie;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.TimeZone;
-import java.util.concurrent.Executor;
-import javax.annotation.PostConstruct;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +16,10 @@ import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.util.concurrent.Executor;
+
 @SpringBootApplication(exclude = {SessionAutoConfiguration.class})
 @EnableConfigurationProperties({LiquibaseProperties.class})
 @EnableCircuitBreaker
@@ -29,16 +27,16 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @EnableAsync
 public class PharmacieApplication {
 
+    private static final Logger log = LoggerFactory.getLogger(PharmacieApplication.class);
     @Autowired
     private ApplicationContext context;
-    private static final Logger log = LoggerFactory.getLogger(PharmacieApplication.class);
     // @Value("${default-lang}")
     // private static String defaultLang;
 
     public static void main(String[] args) throws UnknownHostException {
         SpringApplication app = new SpringApplication(PharmacieApplication.class);
         // DefaultProfileUtil.addDefaultProfile(app);
-         System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
+        System.setProperty("org.apache.tomcat.util.buf.UDecoder.ALLOW_ENCODED_SLASH", "true");
         Environment env = app.run(args).getEnvironment();
 
         String protocol = "http";
@@ -48,14 +46,13 @@ public class PharmacieApplication {
         // defaultLang= env.getProperty("default-lang");
         log.info(
                 "\n----------------------------------------------------------\n\t"
-                + "Application's name '{}' is running! Access URLs:\n\t" + "Local: \t\t{}://localhost:{}\n\t"
-                + "External: \t{}://{}:{}\n\t"
-                + "Profile(s): \t{}\n----------------------------------------------------------",
+                        + "Application's name '{}' is running! Access URLs:\n\t" + "Local: \t\t{}://localhost:{}\n\t"
+                        + "External: \t{}://{}:{}\n\t"
+                        + "Profile(s): \t{}\n----------------------------------------------------------",
                 env.getProperty("spring.application.name"), protocol, env.getProperty("server.port"), protocol,
                 InetAddress.getLocalHost().getHostAddress(), env.getProperty("server.port"), env.getActiveProfiles());
     }
 
-   
 
     @Bean
     public Executor asyncExecutor() {

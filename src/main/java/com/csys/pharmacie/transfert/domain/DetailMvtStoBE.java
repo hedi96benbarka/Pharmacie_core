@@ -70,4 +70,10 @@ public class DetailMvtStoBE extends DetailMvtSto {
         this.mvtStoBE = mvtStoBT;
     }
 
+    @Override
+    public String toString() {
+        return "DetailMvtStoBE{" +
+                "depsto=" + depsto +
+                '}';
+    }
 }
